@@ -47,7 +47,7 @@ When multiple pumps share common parts, a single stock pool can serve the entire
 | Safari  | 14+ |
 | Edge    | 90+ |
 
-No installation or server is required. Open `index.html` directly in any modern browser.
+No installation or server is required. Open `Code.html` directly in any modern browser.
 
 ---
 
@@ -55,7 +55,7 @@ No installation or server is required. Open `index.html` directly in any modern 
 
 ```
 /
-├── index.html              — Main application page
+├── Code.html               — Main application page
 ├── README.md               — This file
 ├── LICENSE                 — MIT License
 ├── .gitignore
@@ -87,7 +87,7 @@ No installation or server is required. Open `index.html` directly in any modern 
 
 ## 🔧 Usage
 
-1. Open `index.html` in your browser.
+1. Open `Code.html` in your browser.
 2. Upload one or more CSV / Excel files (one file per pump or pump type).
 3. (Optional) Label each pump and enter its quantity, model, and location.
 4. Toggle **DIN 24296 Table 32 optimization** if you want interchangeable-parts analysis.

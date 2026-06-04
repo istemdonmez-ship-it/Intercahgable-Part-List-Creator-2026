@@ -15,7 +15,7 @@
 
 ## Getting Started
 
-Open `index.html` in any modern web browser (Chrome 90+, Firefox 88+, Safari 14+, Edge 90+).
+Open `Code.html` in any modern web browser (Chrome 90+, Firefox 88+, Safari 14+, Edge 90+).
 
 No installation, server, or internet connection is required after loading the page.
 
