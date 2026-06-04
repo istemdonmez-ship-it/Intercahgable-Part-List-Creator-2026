@@ -120,7 +120,7 @@ The core of DIN 24296 is **Table 32** (Section 7.7.2), which specifies the recom
 | 5 | 3 pieces |
 | 6–7 | 4 pieces |
 | 8–9 | 4 pieces |
-| ≥ 10 | 30% of fleet (rounded up) |
+| ≥ 10 | 50% of fleet (rounded up) |
 
 ### Coupling Elements / Accessories
 

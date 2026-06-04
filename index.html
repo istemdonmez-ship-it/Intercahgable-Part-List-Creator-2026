@@ -8,7 +8,7 @@
     <!-- Content Security Policy -->
     <meta http-equiv="Content-Security-Policy"
           content="default-src 'self';
-                   script-src 'self' https://cdnjs.cloudflare.com;
+                   script-src 'self';
                    style-src 'self' 'unsafe-inline';">
 
     <!-- Stylesheets -->
@@ -16,19 +16,9 @@
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/responsive.css">
 
-    <!-- Third-party libraries (CDN with Subresource Integrity) -->
-    <!--
-        NOTE: Replace the placeholder integrity hashes below with the actual
-        SHA-384/512 values computed from the CDN files, e.g. via
-        https://www.srihash.org or:
-          curl -s <url> | openssl dgst -sha384 -binary | openssl base64 -A
-    -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"
-            crossorigin="anonymous"
-            referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"
-            crossorigin="anonymous"
-            referrerpolicy="no-referrer"></script>
+    <!-- Third-party libraries (bundled locally — no external CDN dependency) -->
+    <script src="js/lib/xlsx.full.min.js"></script>
+    <script src="js/lib/papaparse.min.js"></script>
 </head>
 <body>
     <div class="container">

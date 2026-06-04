@@ -65,7 +65,9 @@ function isValidFileSize(file, maxMB = 10) {
  * @returns {boolean}
  */
 function isValidPumpLabel(label) {
-    return typeof label === 'string' && label.trim().length > 0 && label.trim().length <= 100;
+    if (typeof label !== 'string') return false;
+    const trimmed = label.trim();
+    return trimmed.length > 0 && trimmed.length <= 100;
 }
 
 /**

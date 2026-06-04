@@ -10,17 +10,17 @@
 
 /* ============================================================
    DIN 24296 Table 32 — Official spare-parts quantity lookup
-   Array indices map as follows:
+   Array indices map directly to fleet size:
      [0] = unused
      [1] = unused
-     [2] = 2  pumps
-     [3] = 3  pumps
-     [4] = 4  pumps
-     [5] = 5  pumps
-     [6] = 6-7 pumps  (index 6 used for this range in code, mapped to [7])
-     [7] = 6-7 pumps  (raw table column)
-     [8] = 8-9 pumps
-     [9] = percentage multiplier for 10+ pumps
+     [2] = 2 pumps
+     [3] = 3 pumps
+     [4] = 4 pumps
+     [5] = 5 pumps
+     [6] = unused (skipped in lookup logic; see 6-7 pump branch)
+     [7] = 6–7 pumps  (used for fleet sizes 6 and 7)
+     [8] = 8–9 pumps  (used for fleet sizes 8 and 9)
+     [9] = percentage multiplier for 10+ pumps (e.g. 0.20 = 20%)
    ============================================================ */
 const DIN_24296_TABLE = {
     shaft:            [0, 0, 1, 1, 1, 2, 2, 2, 2, 0.20],
@@ -63,8 +63,8 @@ function getDIN24296RecommendedQty(partType, numberOfPumps, qtyPerPump) {
         recommendedQty = table[7] * qtyPerPump;
         calculation = `Table 32: ${table[7]} piece(s) for 6–7 pumps × ${qtyPerPump} = ${recommendedQty}`;
     } else if (numberOfPumps >= 2) {
-        recommendedQty = table[numberOfPumps + 1] * qtyPerPump;
-        calculation = `Table 32: ${table[numberOfPumps + 1]} piece(s) for ${numberOfPumps} pumps × ${qtyPerPump} = ${recommendedQty}`;
+        recommendedQty = table[numberOfPumps] * qtyPerPump;
+        calculation = `Table 32: ${table[numberOfPumps]} piece(s) for ${numberOfPumps} pumps × ${qtyPerPump} = ${recommendedQty}`;
     } else {
         recommendedQty = qtyPerPump;
         calculation = `Single pump: ${qtyPerPump} piece(s)`;

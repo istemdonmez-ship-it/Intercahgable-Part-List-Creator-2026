@@ -65,7 +65,7 @@ Returns `true` if the file size is at or below `maxMB` megabytes.
 
 ### `isValidPumpLabel(label)`
 
-Returns `true` if the label is non-empty and ≤ 50 characters.
+Returns `true` if the label is non-empty and ≤ 100 characters.
 
 **Parameters:**
 - `label` {string}

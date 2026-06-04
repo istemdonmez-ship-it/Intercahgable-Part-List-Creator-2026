@@ -34,7 +34,7 @@ When multiple pumps share common parts, a single stock pool can serve the entire
 | 5 pumps   | 2 pcs | 2 pcs | 8 sets |
 | 6–7 pumps | 2 pcs | 3 pcs | 12 sets |
 | 8–9 pumps | 2 pcs | 3 pcs | 12 sets |
-| 10+ pumps | 20% × fleet | 25% × fleet | 150% × fleet |
+| ≥ 10 pumps | 20% × fleet | 25% × fleet | 150% × fleet |
 
 ---
 
