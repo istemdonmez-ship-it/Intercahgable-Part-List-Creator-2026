@@ -1,7 +1,7 @@
 # API Documentation — Interchangeable Parts List Creator
 
 All JavaScript is organized into seven modules (plain scripts, not ES modules).
-Load order in `index.html`:
+Load order in `Code.html`:
 `utils.js` → `fileHandler.js` → `dinClassifier.js` → `dataProcessor.js` → `exportManager.js` → `uiController.js` → `app.js`
 
 ---
