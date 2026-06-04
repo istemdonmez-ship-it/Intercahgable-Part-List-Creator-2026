@@ -1,0 +1,2809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interchangeable Parts List Creator - DIN 24296 Compliant</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .info-banner {
+            background: #e7f3ff;
+            border: 2px solid #2196F3;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .info-banner-icon {
+            font-size: 2.5em;
+        }
+
+        .info-banner-text h3 {
+            color: #1976D2;
+            margin-bottom: 5px;
+        }
+
+        .info-banner-text p {
+            color: #0d47a1;
+            line-height: 1.5;
+        }
+
+        .din-standard-banner {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(238, 90, 111, 0.3);
+        }
+
+        .din-standard-banner h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .din-standard-banner p {
+            line-height: 1.7;
+            opacity: 0.95;
+        }
+
+        .din-table-reference {
+            background: white;
+            color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .din-table-reference h4 {
+            color: #ee5a6f;
+            margin-bottom: 15px;
+        }
+
+        .din-reference-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+
+        .din-reference-table th,
+        .din-reference-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .din-reference-table th {
+            background: #ee5a6f;
+            color: white;
+            font-weight: 600;
+        }
+
+        .din-reference-table td:first-child {
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .upload-section {
+            background: #f8f9fa;
+            border: 3px dashed #667eea;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: #764ba2;
+            background: #f0f0f5;
+        }
+
+        .upload-section.dragover {
+            background: #e8eaf6;
+            border-color: #5e35b1;
+            transform: scale(1.02);
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            margin: 20px 0;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-input-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            display: inline-block;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .file-input-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .uploaded-files {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .file-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .file-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .file-icon {
+            font-size: 2em;
+        }
+
+        .file-details {
+            flex: 1;
+        }
+
+        .file-details h4 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .file-details p {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .pump-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-size: 0.75em;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .pump-input-small {
+            padding: 6px 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 0.9em;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .pump-input-small:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.2);
+        }
+
+        .remove-button {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .remove-button:hover {
+            background: #ff3838;
+            transform: scale(1.05);
+        }
+
+        .din-categories-section {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 30px 0;
+            animation: slideIn 0.5s ease;
+        }
+
+        .din-categories-section h3 {
+            color: #856404;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .din-info-text {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #856404;
+            line-height: 1.8;
+        }
+
+        .din-category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .din-category-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .din-category-card:hover {
+            border-color: #ffc107;
+            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.2);
+        }
+
+        .din-category-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .din-category-icon {
+            font-size: 2.5em;
+        }
+
+        .din-category-title h4 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .din-category-subtitle {
+            color: #666;
+            font-size: 0.85em;
+        }
+
+        .din-category-description {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        .din-recommendation {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .din-examples {
+            font-size: 0.85em;
+            color: #666;
+            padding: 10px;
+            background: #e8f5e9;
+            border-radius: 5px;
+            border-left: 3px solid #4caf50;
+        }
+
+        .din-examples strong {
+            display: block;
+            color: #2e7d32;
+            margin-bottom: 5px;
+        }
+
+        .interchangeable-section {
+            background: #d1ecf1;
+            border: 2px solid #17a2b8;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 30px 0;
+            animation: slideIn 0.5s ease;
+        }
+
+        .interchangeable-section h3 {
+            color: #0c5460;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .interchangeable-section .info-text {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #0c5460;
+            line-height: 1.6;
+        }
+
+        .interchangeable-toggle {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: #ccc;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: #28a745;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active .toggle-slider {
+            left: 33px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #ddd;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #e9ecef;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .results-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .statistics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .stat-card h3 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .stat-card p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .stat-card.highlight {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .stat-card.success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .stat-card.din-class-a {
+            background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+        }
+
+        .stat-card.din-class-b {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .stat-card.din-class-c {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin: 30px 0 20px 0;
+            border-bottom: 2px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            background: #f8f9fa;
+            border: none;
+            border-radius: 10px 10px 0 0;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .parts-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .parts-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .parts-table th,
+        .parts-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 0.9em;
+        }
+
+        .parts-table th {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8em;
+            letter-spacing: 0.5px;
+        }
+
+        .parts-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .parts-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin: 2px;
+        }
+
+        .badge-din-a {
+            background: #dc3545;
+            color: white;
+        }
+
+        .badge-din-b {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .badge-din-c {
+            background: #28a745;
+            color: white;
+        }
+
+        .badge-common {
+            background: #2ed573;
+            color: white;
+        }
+
+        .badge-interchangeable {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .badge-high-use {
+            background: #3742fa;
+            color: white;
+        }
+
+        .quantity-highlight {
+            background: #fff3cd;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: 600;
+            color: #856404;
+        }
+
+        .quantity-optimized {
+            background: #d4edda;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: 600;
+            color: #155724;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn-export {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-excel {
+            background: #217346;
+            color: white;
+        }
+
+        .btn-excel:hover {
+            background: #1a5c37;
+            transform: translateY(-2px);
+        }
+
+        .btn-csv {
+            background: #0984e3;
+            color: white;
+        }
+
+        .btn-csv:hover {
+            background: #0770c7;
+            transform: translateY(-2px);
+        }
+
+        .btn-pdf {
+            background: #d63031;
+            color: white;
+        }
+
+        .btn-pdf:hover {
+            background: #c0201c;
+            transform: translateY(-2px);
+        }
+
+        .btn-common-report {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-common-report:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .btn-comparison-report {
+            background: #6c5ce7;
+            color: white;
+        }
+
+        .btn-comparison-report:hover {
+            background: #5f3dc4;
+            transform: translateY(-2px);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .search-filter {
+            margin: 20px 0;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.2);
+        }
+
+        .filter-select {
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            background: white;
+        }
+
+        .comparison-view {
+            overflow-x: auto;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .pump-summary {
+            background: #e7f3ff;
+            border: 2px solid #2196F3;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .pump-summary h4 {
+            color: #1976D2;
+            margin-bottom: 15px;
+        }
+
+        .pump-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 10px;
+        }
+
+        .pump-list-item {
+            background: white;
+            padding: 12px 15px;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        .pump-list-item strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #1976D2;
+        }
+
+        .pump-list-item .pump-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .din-compliance-info {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .din-compliance-info h4 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+
+        .din-compliance-info ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .din-compliance-info li {
+            background: white;
+            padding: 10px 15px;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .din-compliance-info li::before {
+            content: "✓";
+            color: #ffc107;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .savings-card {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .savings-card h4 {
+            margin-bottom: 10px;
+        }
+
+        .savings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .savings-item {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .savings-item h5 {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .common-spares-highlight {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .common-spares-highlight h4 {
+            color: #155724;
+            margin-bottom: 10px;
+        }
+
+        .common-spares-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .common-stat {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #28a745;
+        }
+
+        .common-stat h5 {
+            font-size: 2em;
+            color: #28a745;
+            margin-bottom: 5px;
+        }
+
+        .common-stat p {
+            color: #155724;
+            font-weight: 600;
+        }
+
+        .pump-availability-matrix {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        .pump-availability-matrix table {
+            min-width: 100%;
+        }
+
+        .pump-availability-matrix th {
+            position: sticky;
+            top: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 10;
+        }
+
+        .comparison-export-section {
+            background: #f0f3ff;
+            border: 2px solid #6c5ce7;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .comparison-export-section h4 {
+            color: #5f3dc4;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .comparison-export-section p {
+            color: #5f3dc4;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .din-calculation-note {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        .din-calculation-note strong {
+            color: #2e7d32;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .statistics {
+                grid-template-columns: 1fr;
+            }
+
+            .parts-table {
+                font-size: 0.85em;
+            }
+
+            .parts-table th,
+            .parts-table td {
+                padding: 8px;
+            }
+
+            .pump-details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .din-category-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .export-buttons {
+                flex-direction: column;
+            }
+
+            .btn-export {
+                width: 100%;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .upload-section,
+            .info-banner,
+            .din-categories-section,
+            .interchangeable-section,
+            .action-buttons,
+            .export-buttons,
+            .search-filter,
+            .tabs,
+            .comparison-export-section {
+                display: none !important;
+            }
+
+            .container {
+                box-shadow: none;
+            }
+
+            .results-section {
+                display: block !important;
+            }
+
+            .tab-content {
+                display: block !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Interchangeable Parts List Creator</h1>
+            <p>Professional Edition - DIN 24296 Table 32 Compliant</p>
+        </div>
+
+        <div class="main-content">
+            <!-- DIN Standard Banner -->
+            <div class="din-standard-banner">
+                <h3>📋 DIN 24296 Standard - Table 32 Implementation</h3>
+                <p><strong>Recommended spare parts stock for 2 years' operation</strong></p>
+                <p>This application implements the exact DIN 24296 Table 32 lookup table for centrifugal pump spare parts stock calculation. 
+                   Quantities are based on fleet size (2-10+ pumps) and part criticality, not simple percentages.</p>
+                
+                <div class="din-table-reference">
+                    <h4>📊 DIN 24296 Table 32 - Quick Reference</h4>
+                    <p style="margin-bottom: 15px; color: #666;">Official recommended quantities by fleet size:</p>
+                    <table class="din-reference-table">
+                        <thead>
+                            <tr>
+                                <th>Part Type</th>
+                                <th>2</th>
+                                <th>3</th>
+                                <th>4</th>
+                                <th>5</th>
+                                <th>6-7</th>
+                                <th>8-9</th>
+                                <th>10+</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Shaft / Impeller</td>
+                                <td>1</td>
+                                <td>1</td>
+                                <td>1</td>
+                                <td>2</td>
+                                <td>2</td>
+                                <td>2</td>
+                                <td>20%</td>
+                            </tr>
+                            <tr>
+                                <td>Bearings (all types)</td>
+                                <td>1</td>
+                                <td>1</td>
+                                <td>2</td>
+                                <td>2</td>
+                                <td>2</td>
+                                <td>3</td>
+                                <td>25%</td>
+                            </tr>
+                            <tr>
+                                <td>Wear Rings / Sleeve</td>
+                                <td>2</td>
+                                <td>2</td>
+                                <td>2</td>
+                                <td>3</td>
+                                <td>3</td>
+                                <td>4</td>
+                                <td>50%</td>
+                            </tr>
+                            <tr>
+                                <td>Sealing Elements (set)</td>
+                                <td>4</td>
+                                <td>6</td>
+                                <td>8</td>
+                                <td>8</td>
+                                <td>9</td>
+                                <td>12</td>
+                                <td>150%</td>
+                            </tr>
+                            <tr>
+                                <td>Mechanical Seal</td>
+                                <td>1</td>
+                                <td>1</td>
+                                <td>2</td>
+                                <td>2</td>
+                                <td>2</td>
+                                <td>3</td>
+                                <td>25%</td>
+                            </tr>
+                            <tr>
+                                <td>Gland Packing (set)</td>
+                                <td>4</td>
+                                <td>4</td>
+                                <td>6</td>
+                                <td>6</td>
+                                <td>6</td>
+                                <td>8</td>
+                                <td>100%</td>
+                            </tr>
+                            <tr>
+                                <td>Coupling Elements</td>
+                                <td>1</td>
+                                <td>1</td>
+                                <td>2</td>
+                                <td>2</td>
+                                <td>3</td>
+                                <td>4</td>
+                                <td>30%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p style="margin-top: 15px; color: #666; font-style: italic;">
+                        <strong>Note:</strong> For 10+ pumps, percentages apply to total fleet quantity per part.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Info Banner -->
+            <div class="info-banner">
+                <div class="info-banner-icon">💡</div>
+                <div class="info-banner-text">
+                    <h3>How it works</h3>
+                    <p><strong>DIN 24296 Table 32 Calculation:</strong> Upload spare parts files (CSV/Excel) for your pumps. 
+                    The application uses the official DIN 24296 lookup table to calculate exact recommended stock quantities based on your fleet size.</p>
+                </div>
+            </div>
+
+            <!-- Upload Section -->
+            <div class="upload-section" id="uploadSection">
+                <div class="empty-state-icon">📁</div>
+                <h2>Drop files here or click to upload</h2>
+                <p style="margin: 15px 0; color: #666;">Support for CSV and Excel files (.csv, .xlsx, .xls)</p>
+                
+                <div class="file-input-wrapper">
+                    <input type="file" id="fileInput" class="file-input" multiple accept=".csv,.xlsx,.xls">
+                    <label for="fileInput" class="file-input-button">Choose Files</label>
+                </div>
+
+                <div class="uploaded-files" id="uploadedFiles"></div>
+            </div>
+
+            <!-- DIN 24296 Categories Explanation -->
+            <div class="din-categories-section" id="dinCategoriesSection" style="display: none;">
+                <h3>📊 DIN 24296 Table 32 - Part Categories</h3>
+                <div class="din-info-text">
+                    <strong>Industry Standard Approach:</strong> DIN 24296 Table 32 provides exact quantities for recommended spare parts stock 
+                    for 2 years' operation. The table uses fleet size as the primary factor, with different quantities for each part category.
+                </div>
+
+                <div class="din-category-grid">
+                    <!-- Critical Wearing Parts -->
+                    <div class="din-category-card">
+                        <div class="din-category-header">
+                            <div class="din-category-icon">🔴</div>
+                            <div class="din-category-title">
+                                <h4>Critical Wearing Parts</h4>
+                                <div class="din-category-subtitle">High Consumption | 50-150% Stock</div>
+                            </div>
+                        </div>
+                        <div class="din-category-description">
+                            Parts with high wear rates and consumption. DIN 24296 recommends higher quantities due to frequent replacement needs.
+                        </div>
+                        <div class="din-recommendation">
+                            Table 32: 2-4 sets for small fleets, 50-150% for 10+ pumps
+                        </div>
+                        <div class="din-examples">
+                            <strong>Examples (from Table 32):</strong>
+                            • Sealing elements: 4-12 sets<br>
+                            • Gland packing: 4-8 sets<br>
+                            • Wear rings: 2-4 pieces<br>
+                            • Shaft sleeves: 2-4 pieces
+                        </div>
+                    </div>
+
+                    <!-- Mechanical Components -->
+                    <div class="din-category-card">
+                        <div class="din-category-header">
+                            <div class="din-category-icon">🟡</div>
+                            <div class="din-category-title">
+                                <h4>Mechanical Components</h4>
+                                <div class="din-category-subtitle">Predictable Life | 20-30% Stock</div>
+                            </div>
+                        </div>
+                        <div class="din-category-description">
+                            Components with predictable MTBF. DIN 24296 Table 32 specifies 1-2 pieces for small fleets, scaling to percentages for larger installations.
+                        </div>
+                        <div class="din-recommendation">
+                            Table 32: 1-2 pieces for small fleets, 20-30% for 10+ pumps
+                        </div>
+                        <div class="din-examples">
+                            <strong>Examples (from Table 32):</strong>
+                            • Shafts: 1-2 pieces (20% for 10+)<br>
+                            • Impellers: 1-2 pieces (20% for 10+)<br>
+                            • Coupling elements: 1-4 pieces (30% for 10+)
+                        </div>
+                    </div>
+
+                    <!-- Bearings -->
+                    <div class="din-category-card">
+                        <div class="din-category-header">
+                            <div class="din-category-icon">🟢</div>
+                            <div class="din-category-title">
+                                <h4>Bearings & Rolling Elements</h4>
+                                <div class="din-category-subtitle">Scheduled Replacement | 25% Stock</div>
+                            </div>
+                        </div>
+                        <div class="din-category-description">
+                            All bearing types (radial ball, roller, angular contact). DIN 24296 specifies consistent quantities due to scheduled replacement intervals.
+                        </div>
+                        <div class="din-recommendation">
+                            Table 32: 1-3 pieces, 25% for 10+ pumps
+                        </div>
+                        <div class="din-examples">
+                            <strong>Examples (from Table 32):</strong>
+                            • Rolling element bearings: 1-3 sets<br>
+                            • Radial ball bearings: 1-3 pieces<br>
+                            • Radial roller bearings: 1-3 pieces
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interchangeable Parts Configuration -->
+            <div class="interchangeable-section" id="interchangeableSection" style="display: none;">
+                <h3>🔄 Enable DIN 24296 Table 32 Optimization</h3>
+                <div class="info-text">
+                    <strong>💡 Official Standard Calculation</strong><br>
+                    Enable this feature to apply the exact DIN 24296 Table 32 lookup for spare parts quantities. 
+                    The system will automatically select the correct quantity based on:
+                    <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
+                        <li><strong>Fleet Size:</strong> 2, 3, 4, 5, 6-7, 8-9, or 10+ pumps</li>
+                        <li><strong>Part Category:</strong> Automatic detection (shaft, impeller, bearing, seal, etc.)</li>
+                        <li><strong>Part Number Match:</strong> Identical material numbers are pooled</li>
+                    </ul>
+                    <br>
+                    <strong>Example:</strong> For 12 pumps with identical mechanical seals:
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li>❌ Without optimization: 12 seals (1 per pump)</li>
+                        <li>✅ With DIN 24296 Table 32: 3 seals (25% × 12 = 3)</li>
+                        <li>💰 Savings: 9 seals (75% reduction)</li>
+                    </ul>
+                </div>
+
+                <div class="interchangeable-toggle">
+                    <div class="toggle-switch" id="interchangeableToggle">
+                        <div class="toggle-slider"></div>
+                    </div>
+                    <label style="font-weight: 600; cursor: pointer; user-select: none;" onclick="document.getElementById('interchangeableToggle').click()">
+                        Enable DIN 24296 Table 32 Calculation (Recommended)
+                    </label>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="analyzeButton" disabled>
+                    🔍 Analyze Parts (DIN 24296 Table 32)
+                </button>
+                <button class="btn btn-secondary" id="clearButton" disabled>
+                    🗑️ Clear All
+                </button>
+            </div>
+
+            <!-- Loading -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Analyzing parts with DIN 24296 Table 32 and calculating recommended quantities...</p>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section" id="resultsSection">
+                <h2 style="margin: 30px 0 20px 0;">📊 Analysis Results (DIN 24296 Table 32 Compliant)</h2>
+
+                <!-- Pump Summary -->
+                <div class="pump-summary" id="pumpSummary"></div>
+
+                <!-- DIN Compliance Info -->
+                <div class="din-compliance-info" id="dinComplianceInfo" style="display: none;"></div>
+
+                <!-- Savings Card -->
+                <div class="savings-card" id="savingsCard" style="display: none;"></div>
+
+                <!-- Statistics -->
+                <div class="statistics" id="statistics"></div>
+
+                <!-- Search and Filter -->
+                <div class="search-filter">
+                    <input type="text" class="search-input" id="searchInput" placeholder="🔍 Search by part number, designation, material, or serial...">
+                    <select class="filter-select" id="categoryFilter">
+                        <option value="all">All Categories</option>
+                    </select>
+                    <select class="filter-select" id="commonalityFilter">
+                        <option value="all">All Parts</option>
+                        <option value="common">Common Parts Only</option>
+                        <option value="interchangeable">DIN 24296 Optimized</option>
+                        <option value="high-use">High Usage (5+ pumps)</option>
+                    </select>
+                </div>
+
+                <!-- Export Buttons -->
+                <div class="export-buttons">
+                    <button class="btn-export btn-excel" id="exportExcel">
+                        📊 Export to Excel (DIN 24296)
+                    </button>
+                    <button class="btn-export btn-csv" id="exportCSV">
+                        📄 Export to CSV
+                    </button>
+                    <button class="btn-export btn-common-report" id="exportCommonReport">
+                        ⭐ Export Common Spares Only
+                    </button>
+                    <button class="btn-export btn-comparison-report" id="exportComparisonReport">
+                        🔄 Export Pump Comparison Matrix
+                    </button>
+                    <button class="btn-export btn-pdf" id="exportPDF">
+                        📑 Print Report
+                    </button>
+                </div>
+
+                <!-- Tabs -->
+                <div class="tabs">
+                    <button class="tab active" data-tab="all">All Parts</button>
+                    <button class="tab" data-tab="common-only">⭐ Common Spares</button>
+                    <button class="tab" data-tab="shafts">Shafts</button>
+                    <button class="tab" data-tab="impellers">Impellers</button>
+                    <button class="tab" data-tab="seals">Seals</button>
+                    <button class="tab" data-tab="bearings">Bearings</button>
+                    <button class="tab" data-tab="wear-parts">Wear Parts</button>
+                    <button class="tab" data-tab="accessories">Accessories</button>
+                    <button class="tab" data-tab="comparison">Pump Comparison</button>
+                </div>
+
+                <!-- Tab Contents -->
+                <div class="tab-content active" id="tab-all">
+                    <table class="parts-table" id="allPartsTable">
+                        <thead>
+                            <tr>
+                                <th>Part No.</th>
+                                <th>Material No.</th>
+                                <th>Designation</th>
+                                <th>Material</th>
+                                <th>Pump Model</th>
+                                <th>Qty/Pump</th>
+                                <th>Standard Qty</th>
+                                <th>DIN 24296 Qty</th>
+                                <th>Savings</th>
+                                <th>Found In</th>
+                                <th>Category</th>
+                                <th>DIN Calculation</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <!-- Common Spares Tab -->
+                <div class="tab-content" id="tab-common-only">
+                    <div class="common-spares-highlight" id="commonSparesHighlight"></div>
+                    
+                    <h3 style="margin: 20px 0;">📋 Common Spares Inventory List (DIN 24296 Table 32)</h3>
+                    <p style="margin-bottom: 20px; color: #666;">Parts used in 2+ pumps - Quantities calculated using DIN 24296 Table 32</p>
+                    
+                    <table class="parts-table" id="commonOnlyTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Part No.</th>
+                                <th>Material No.</th>
+                                <th>Designation</th>
+                                <th>Category</th>
+                                <th>Qty/Pump</th>
+                                <th>Used In</th>
+                                <th>Standard Qty</th>
+                                <th>DIN 24296 Qty</th>
+                                <th>Savings</th>
+                                <th>Calculation</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+
+                    <h3 style="margin: 30px 0 20px 0;">🔍 Pump Availability Matrix</h3>
+                    <div class="pump-availability-matrix" id="commonSparesMatrix"></div>
+                </div>
+
+                <div class="tab-content" id="tab-shafts">
+                    <div class="din-calculation-note">
+                        <strong>DIN 24296 Table 32 - Shafts:</strong> 
+                        1 piece for 2-4 pumps, 2 pieces for 5-9 pumps, 20% for 10+ pumps
+                    </div>
+                    <table class="parts-table" id="shaftsPartsTable">
+                        <thead>
+                            <tr>
+                                <th>Part No.</th>
+                                <th>Material No.</th>
+                                <th>Designation</th>
+                                <th>Material</th>
+                                <th>Qty/Pump</th>
+                                <th>Standard Qty</th>
+                                <th>DIN 24296 Qty</th>
+                                <th>Savings</th>
+                                <th>Found In</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div class="tab-content" id="tab-impellers">
+                    <div class="din-calculation-note">
+                        <strong>DIN 24296 Table 32 - Impellers:</strong> 
+                        1 piece for 2-4 pumps, 2 pieces for 5-9 pumps, 20% for 10+ pumps
+                    </div>
+                    <table class="parts-table" id="impellersPartsTable">
+                        <thead>
+                            <tr>
+                                <th>Part No.</th>
+                                <th>Material No.</th>
+                                <th>Designation</th>
+                                <th>Material</th>
+                                <th>Qty/Pump</th>
+                                <th>Standard Qty</th>
+                                <th>DIN 24296 Qty</th>
+                                <th>Savings</th>
+                                <th>Found In</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div class="tab-content" id="tab-seals">
+                    <div class="din-calculation-note">
+                        <strong>DIN 24296 Table 32 - Seals:</strong><br>
+                        • Mechanical Seals: 1-3 pieces (25% for 10+)<br>
+                        • Sealing Elements (set): 4-12 sets (150% for 10+)<br>
+                        • Gland Packing (set): 4-8 sets (100% for 10+)
+                    </div>
+                    <table class="parts-table" id="sealsPartsTable">
+                        <thead>
+                            <tr>
+                                <th>Part No.</th>
+                                <th>Material No.</th>
+                                <th>Designation</th>
+                                <th>Material</th>
+                                <th>Qty/Pump</th>
+                                <th>Standard Qty</th>
+                                <th>DIN 24296 Qty</th>
+                                <th>Savings</th>
+                                <th>Found In</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div class="tab-content" id="tab-bearings">
+                    <div class="din-calculation-note">
+                        <strong>DIN 24296 Table 32 - Bearings:</strong> 
+                        1 piece for 2-3 pumps, 2 pieces for 4-7 pumps, 3 pieces for 8-9 pumps, 25% for 10+ pumps
+                    </div>
+                    <table class="parts-table" id="bearingsPartsTable">
+                        <thead>
+                            <tr>
+                                <th>Part No.</th>
+                                <th>Material No.</th>
+                                <th>Designation</th>
+                                <th>Material</th>
+                                <th>Qty/Pump</th>
+                                <th>Standard Qty</th>
+                                <th>DIN 24296 Qty</th>
+                                <th>Savings</th>
+                                <th>Found In</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div class="tab-content" id="tab-wear-parts">
+                    <div class="din-calculation-note">
+                        <strong>DIN 24296 Table 32 - Wear Parts:</strong><br>
+                        • Wear Rings: 2-4 pieces (50% for 10+)<br>
+                        • Shaft Sleeves: 2-4 pieces (50% for 10+)
+                    </div>
+                    <table class="parts-table" id="wearPartsTable">
+                        <thead>
+                            <tr>
+                                <th>Part No.</th>
+                                <th>Material No.</th>
+                                <th>Designation</th>
+                                <th>Material</th>
+                                <th>Qty/Pump</th>
+                                <th>Standard Qty</th>
+                                <th>DIN 24296 Qty</th>
+                                <th>Savings</th>
+                                <th>Found In</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div class="tab-content" id="tab-accessories">
+                    <div class="din-calculation-note">
+                        <strong>DIN 24296 Table 32 - Accessories:</strong> 
+                        Coupling elements: 1-4 pieces (30% for 10+ pumps)
+                    </div>
+                    <table class="parts-table" id="accessoriesPartsTable">
+                        <thead>
+                            <tr>
+                                <th>Part No.</th>
+                                <th>Material No.</th>
+                                <th>Designation</th>
+                                <th>Material</th>
+                                <th>Qty/Pump</th>
+                                <th>Standard Qty</th>
+                                <th>DIN 24296 Qty</th>
+                                <th>Savings</th>
+                                <th>Found In</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div class="tab-content" id="tab-comparison">
+                    <!-- Comparison Export Section -->
+                    <div class="comparison-export-section">
+                        <h4>🔄 Export Pump Comparison Matrix</h4>
+                        <p>
+                            <strong>Comprehensive cross-reference report</strong> showing which parts are present in each pump. 
+                            Perfect for maintenance planning and identifying interchangeable components across your fleet.
+                        </p>
+                        <button class="btn-export btn-comparison-report" onclick="document.getElementById('exportComparisonReport').click()">
+                            📊 Export Comparison Matrix to Excel
+                        </button>
+                    </div>
+
+                    <div class="comparison-view" id="comparisonView"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let uploadedFilesData = [];
+        let analyzedData = null;
+        let interchangeableEnabled = false;
+
+        // DOM elements
+        const fileInput = document.getElementById('fileInput');
+        const uploadSection = document.getElementById('uploadSection');
+        const uploadedFilesDiv = document.getElementById('uploadedFiles');
+        const dinCategoriesSection = document.getElementById('dinCategoriesSection');
+        const interchangeableSection = document.getElementById('interchangeableSection');
+        const interchangeableToggle = document.getElementById('interchangeableToggle');
+        const analyzeButton = document.getElementById('analyzeButton');
+        const clearButton = document.getElementById('clearButton');
+        const loading = document.getElementById('loading');
+        const resultsSection = document.getElementById('resultsSection');
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const commonalityFilter = document.getElementById('commonalityFilter');
+
+        // DIN 24296 Table 32 - Official Lookup Table
+        // Index: [0=unused, 1=unused, 2=2pumps, 3=3pumps, 4=4pumps, 5=5pumps, 6-7=6-7pumps, 8-9=8-9pumps, 10+=percentage]
+        const DIN_24296_TABLE = {
+            'shaft': [0, 0, 1, 1, 1, 2, 2, 2, 2, 0.20],
+            'impeller': [0, 0, 1, 1, 1, 2, 2, 2, 2, 0.20],
+            'bearing-rolling': [0, 0, 1, 1, 2, 2, 2, 3, 3, 0.25],
+            'bearing-ball': [0, 0, 1, 1, 2, 2, 2, 3, 3, 0.25],
+            'bearing-roller': [0, 0, 1, 1, 2, 2, 2, 3, 3, 0.25],
+            'wear-ring': [0, 0, 2, 2, 2, 3, 3, 4, 4, 0.50],
+            'sleeve': [0, 0, 2, 2, 2, 3, 3, 4, 4, 0.50],
+            'seal-mechanical': [0, 0, 1, 1, 2, 2, 2, 3, 3, 0.25],
+            'seal-elements': [0, 0, 4, 6, 8, 8, 9, 12, 12, 1.50],
+            'seal-gland': [0, 0, 4, 4, 6, 6, 6, 8, 8, 1.00],
+            'coupling': [0, 0, 1, 1, 2, 2, 3, 4, 4, 0.30],
+            'gasket': [0, 0, 4, 6, 8, 8, 9, 12, 12, 1.50], // Similar to seal-elements
+            'o-ring': [0, 0, 4, 6, 8, 8, 9, 12, 12, 1.50], // Similar to seal-elements
+            'default': [0, 0, 1, 1, 1, 2, 2, 2, 2, 0.20] // Conservative default
+        };
+
+        /**
+         * Get recommended quantity from DIN 24296 Table 32
+         * @param {string} partType - Type of part (shaft, impeller, bearing, etc.)
+         * @param {number} numberOfPumps - Total number of pumps in fleet
+         * @param {number} qtyPerPump - Quantity per pump
+         * @returns {object} - { recommendedQty, calculation }
+         */
+        function getDIN24296RecommendedQty(partType, numberOfPumps, qtyPerPump) {
+            const table = DIN_24296_TABLE[partType] || DIN_24296_TABLE['default'];
+            let recommendedQty;
+            let calculation;
+
+            if (numberOfPumps >= 10) {
+                // For 10+ pumps, use percentage formula
+                const percentage = table[9];
+                recommendedQty = Math.max(1, Math.ceil(numberOfPumps * qtyPerPump * percentage));
+                calculation = `Table 32: ${(percentage * 100)}% × ${numberOfPumps} pumps × ${qtyPerPump} = ${recommendedQty}`;
+            } else if (numberOfPumps >= 8) {
+                recommendedQty = table[8] * qtyPerPump;
+                calculation = `Table 32: ${table[8]} piece(s) for 8-9 pumps × ${qtyPerPump} = ${recommendedQty}`;
+            } else if (numberOfPumps >= 6) {
+                recommendedQty = table[7] * qtyPerPump;
+                calculation = `Table 32: ${table[7]} piece(s) for 6-7 pumps × ${qtyPerPump} = ${recommendedQty}`;
+            } else if (numberOfPumps >= 2 && numberOfPumps <= 5) {
+                recommendedQty = table[numberOfPumps + 1] * qtyPerPump;
+                calculation = `Table 32: ${table[numberOfPumps + 1]} piece(s) for ${numberOfPumps} pumps × ${qtyPerPump} = ${recommendedQty}`;
+            } else {
+                // Single pump - no optimization
+                recommendedQty = qtyPerPump;
+                calculation = `Single pump: ${qtyPerPump} piece(s)`;
+            }
+
+            return {
+                recommendedQty: Math.max(1, recommendedQty),
+                calculation: calculation
+            };
+        }
+
+        // File upload handling
+        fileInput.addEventListener('change', handleFileSelect);
+        uploadSection.addEventListener('dragover', handleDragOver);
+        uploadSection.addEventListener('dragleave', handleDragLeave);
+        uploadSection.addEventListener('drop', handleDrop);
+        analyzeButton.addEventListener('click', analyzeParts);
+        clearButton.addEventListener('click', clearAll);
+
+        // Interchangeable toggle
+        interchangeableToggle.addEventListener('click', () => {
+            interchangeableEnabled = !interchangeableEnabled;
+            interchangeableToggle.classList.toggle('active');
+        });
+
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+        });
+
+        // Search and filter
+        searchInput.addEventListener('input', applyFilters);
+        categoryFilter.addEventListener('change', applyFilters);
+        commonalityFilter.addEventListener('change', applyFilters);
+
+        // Export buttons
+        document.getElementById('exportExcel').addEventListener('click', exportToExcel);
+        document.getElementById('exportCSV').addEventListener('click', exportToCSV);
+        document.getElementById('exportCommonReport').addEventListener('click', exportCommonSparesReport);
+        document.getElementById('exportComparisonReport').addEventListener('click', exportComparisonMatrix);
+        document.getElementById('exportPDF').addEventListener('click', printReport);
+
+        function handleFileSelect(e) {
+            const files = Array.from(e.target.files);
+            processFiles(files);
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            uploadSection.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            uploadSection.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            uploadSection.classList.remove('dragover');
+            const files = Array.from(e.dataTransfer.files);
+            processFiles(files);
+        }
+
+        function processFiles(files) {
+            files.forEach(file => {
+                if (file.name.endsWith('.csv') || file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+                    const fileData = {
+                        file: file,
+                        name: file.name,
+                        size: formatFileSize(file.size),
+                        id: Date.now() + Math.random(),
+                        pumpLabel: `Pump ${uploadedFilesData.length + 1}`,
+                        pumpQuantity: 1,
+                        pumpModel: '',
+                        serialNo: '',
+                        location: ''
+                    };
+                    uploadedFilesData.push(fileData);
+                    addFileToUI(fileData);
+                } else {
+                    alert(`File ${file.name} is not supported. Please upload CSV or Excel files.`);
+                }
+            });
+
+            updateButtons();
+            showConfigurationSections();
+        }
+
+        function addFileToUI(fileData) {
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            fileItem.dataset.id = fileData.id;
+            fileItem.innerHTML = `
+                <div class="file-item-header">
+                    <div class="file-info">
+                        <div class="file-icon">${fileData.name.endsWith('.csv') ? '📄' : '📊'}</div>
+                        <div class="file-details">
+                            <h4>${fileData.name}</h4>
+                            <p>${fileData.size}</p>
+                        </div>
+                    </div>
+                    <button class="remove-button" onclick="removeFile(${fileData.id})">Remove</button>
+                </div>
+                <div class="pump-details-grid">
+                    <div class="detail-item">
+                        <span class="detail-label">Pump Label</span>
+                        <input type="text" class="pump-input-small" value="${fileData.pumpLabel}" 
+                               placeholder="e.g., P-1001" 
+                               onchange="updatePumpData(${fileData.id}, 'pumpLabel', this.value)">
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Quantity</span>
+                        <input type="number" class="pump-input-small" value="${fileData.pumpQuantity}" 
+                               min="1" placeholder="1"
+                               onchange="updatePumpData(${fileData.id}, 'pumpQuantity', parseInt(this.value) || 1)">
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Model (Auto-detect)</span>
+                        <input type="text" class="pump-input-small" value="${fileData.pumpModel}" 
+                               placeholder="Will be detected"
+                               onchange="updatePumpData(${fileData.id}, 'pumpModel', this.value)">
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Serial No. (Auto-detect)</span>
+                        <input type="text" class="pump-input-small" value="${fileData.serialNo}" 
+                               placeholder="Will be detected"
+                               onchange="updatePumpData(${fileData.id}, 'serialNo', this.value)">
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Location</span>
+                        <input type="text" class="pump-input-small" value="${fileData.location}" 
+                               placeholder="e.g., Building A"
+                               onchange="updatePumpData(${fileData.id}, 'location', this.value)">
+                    </div>
+                </div>
+            `;
+            uploadedFilesDiv.appendChild(fileItem);
+        }
+
+        function updatePumpData(id, field, value) {
+            const fileData = uploadedFilesData.find(f => f.id === id);
+            if (fileData) {
+                fileData[field] = value;
+            }
+        }
+
+        function removeFile(id) {
+            uploadedFilesData = uploadedFilesData.filter(f => f.id !== id);
+            const fileItem = document.querySelector(`[data-id="${id}"]`);
+            if (fileItem) fileItem.remove();
+            
+            uploadedFilesData.forEach((file, index) => {
+                if (file.pumpLabel.startsWith('Pump ')) {
+                    file.pumpLabel = `Pump ${index + 1}`;
+                    const input = document.querySelector(`[data-id="${file.id}"] .pump-input-small`);
+                    if (input) input.value = file.pumpLabel;
+                }
+            });
+            
+            updateButtons();
+            
+            if (uploadedFilesData.length === 0) {
+                dinCategoriesSection.style.display = 'none';
+                interchangeableSection.style.display = 'none';
+            }
+        }
+
+        function showConfigurationSections() {
+            if (uploadedFilesData.length > 0) {
+                dinCategoriesSection.style.display = 'block';
+                interchangeableSection.style.display = 'block';
+            }
+        }
+
+        function updateButtons() {
+            const hasFiles = uploadedFilesData.length > 0;
+            analyzeButton.disabled = !hasFiles;
+            clearButton.disabled = !hasFiles;
+        }
+
+        function clearAll() {
+            uploadedFilesData = [];
+            uploadedFilesDiv.innerHTML = '';
+            dinCategoriesSection.style.display = 'none';
+            interchangeableSection.style.display = 'none';
+            resultsSection.style.display = 'none';
+            analyzedData = null;
+            interchangeableEnabled = false;
+            interchangeableToggle.classList.remove('active');
+            updateButtons();
+            fileInput.value = '';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        async function analyzeParts() {
+            loading.classList.add('active');
+            resultsSection.style.display = 'none';
+
+            try {
+                const allParts = [];
+                
+                for (const fileData of uploadedFilesData) {
+                    const parts = await parseFile(fileData.file);
+                    
+                    if (parts.length > 0) {
+                        if (!fileData.pumpModel && parts[0].description) {
+                            fileData.pumpModel = parts[0].description;
+                        }
+                        if (!fileData.serialNo && parts[0].serialNo) {
+                            fileData.serialNo = parts[0].serialNo;
+                        }
+                    }
+                    
+                    parts.forEach(part => {
+                        part.sourceFile = fileData.pumpLabel;
+                        part.sourceFileName = fileData.name;
+                        part.pumpQuantity = fileData.pumpQuantity;
+                        part.pumpModel = fileData.pumpModel || part.description || 'N/A';
+                        part.pumpSerialNo = fileData.serialNo || part.serialNo || 'N/A';
+                        part.location = fileData.location;
+                    });
+                    allParts.push(...parts);
+                }
+
+                const totalPumps = uploadedFilesData.reduce((sum, f) => sum + f.pumpQuantity, 0);
+                
+                analyzedData = processAndCategorizeParts(allParts, totalPumps, interchangeableEnabled);
+                displayResults(analyzedData, interchangeableEnabled);
+
+                loading.classList.remove('active');
+                resultsSection.style.display = 'block';
+
+                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            } catch (error) {
+                console.error('Error analyzing parts:', error);
+                alert('Error analyzing files. Please check the file format and try again.');
+                loading.classList.remove('active');
+            }
+        }
+
+        async function parseFile(file) {
+            return new Promise((resolve, reject) => {
+                const fileName = file.name.toLowerCase();
+
+                if (fileName.endsWith('.csv')) {
+                    Papa.parse(file, {
+                        header: true,
+                        skipEmptyLines: true,
+                        delimiter: ';',
+                        complete: (results) => {
+                            const parts = results.data.map(row => ({
+                                partNo: cleanValue(row['Part No.'] || row['Part No'] || row['PTT'] || ''),
+                                designation: cleanValue(row['Designation'] || row['Name'] || ''),
+                                materialNumber: cleanValue(row['Material Number'] || row['Material'] || ''),
+                                material: cleanValue(row['Material'] || ''),
+                                quantity: parseFloat(cleanValue(row['Quantity'] || '0')),
+                                quantityUnit: cleanValue(row['Quantity Unit'] || 'Piece'),
+                                weight: parseFloat(cleanValue(row['Weight'] || '0')),
+                                weightUnit: cleanValue(row['Weight Unit'] || 'kg'),
+                                addToCart: cleanValue(row['Add to Cart'] || '-'),
+                                serialNo: cleanValue(row['Serial No.'] || row['Serial-No.'] || ''),
+                                year: cleanValue(row['Year'] || ''),
+                                description: cleanValue(row['Description'] || row['Size'] || '')
+                            })).filter(part => part.partNo && part.partNo !== '');
+                            resolve(parts);
+                        },
+                        error: reject
+                    });
+                } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const data = new Uint8Array(e.target.result);
+                            const workbook = XLSX.read(data, { type: 'array' });
+                            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                            const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                            
+                            let headerRow = 0;
+                            for (let i = 0; i < jsonData.length; i++) {
+                                if (jsonData[i].some(cell => cell && (cell.toString().includes('Part No') || cell.toString().includes('PTT')))) {
+                                    headerRow = i;
+                                    break;
+                                }
+                            }
+
+                            const headers = jsonData[headerRow];
+                            const parts = [];
+
+                            for (let i = headerRow + 1; i < jsonData.length; i++) {
+                                const row = jsonData[i];
+                                if (!row || row.length === 0) continue;
+
+                                const part = {
+                                    partNo: cleanValue(getCellValue(row, headers, 'Part No') || getCellValue(row, headers, 'PTT')),
+                                    designation: cleanValue(getCellValue(row, headers, 'Designation') || getCellValue(row, headers, 'Name')),
+                                    materialNumber: cleanValue(getCellValue(row, headers, 'Material Number') || getCellValue(row, headers, 'Material')),
+                                    material: cleanValue(getCellValue(row, headers, 'Material')),
+                                    quantity: parseFloat(cleanValue(getCellValue(row, headers, 'Quantity')) || '0'),
+                                    quantityUnit: cleanValue(getCellValue(row, headers, 'Quantity Unit') || 'Piece'),
+                                    weight: parseFloat(cleanValue(getCellValue(row, headers, 'Weight')) || '0'),
+                                    weightUnit: cleanValue(getCellValue(row, headers, 'Weight Unit') || 'kg'),
+                                    addToCart: cleanValue(getCellValue(row, headers, 'Add to Cart') || '-'),
+                                    serialNo: cleanValue(getCellValue(row, headers, 'Serial No') || getCellValue(row, headers, 'Serial-No.')),
+                                    year: cleanValue(getCellValue(row, headers, 'Year')),
+                                    description: cleanValue(getCellValue(row, headers, 'Description') || getCellValue(row, headers, 'Size'))
+                                };
+
+                                if (part.partNo) {
+                                    parts.push(part);
+                                }
+                            }
+
+                            resolve(parts);
+                        } catch (error) {
+                            reject(error);
+                        }
+                    };
+                    reader.onerror = reject;
+                    reader.readAsArrayBuffer(file);
+                }
+            });
+        }
+
+        function getCellValue(row, headers, columnName) {
+            const index = headers.findIndex(h => h && h.toString().includes(columnName));
+            return index >= 0 ? row[index] : '';
+        }
+
+        function cleanValue(value) {
+            if (!value) return '';
+            return value.toString().trim().replace(/^["'\s]+|["'\s]+$/g, '');
+        }
+
+        function processAndCategorizeParts(allParts, totalPumps, usedin24296) {
+            const partsMap = new Map();
+
+            allParts.forEach(part => {
+                const key = `${part.materialNumber}`;
+                
+                if (partsMap.has(key)) {
+                    const existing = partsMap.get(key);
+                    existing.quantityPerPump = Math.max(existing.quantityPerPump, part.quantity);
+                    existing.sourceFiles.add(part.sourceFile);
+                    existing.occurrences++;
+                    if (part.pumpModel && !existing.pumpModels.includes(part.pumpModel)) {
+                        existing.pumpModels.push(part.pumpModel);
+                    }
+                    if (part.pumpSerialNo && !existing.serialNos.includes(part.pumpSerialNo)) {
+                        existing.serialNos.push(part.pumpSerialNo);
+                    }
+                } else {
+                    partsMap.set(key, {
+                        ...part,
+                        quantityPerPump: part.quantity,
+                        sourceFiles: new Set([part.sourceFile]),
+                        occurrences: 1,
+                        pumpModels: part.pumpModel ? [part.pumpModel] : [],
+                        serialNos: part.pumpSerialNo ? [part.pumpSerialNo] : []
+                    });
+                }
+            });
+
+            const consolidatedParts = Array.from(partsMap.values()).map(part => {
+                const category = categorizePart(part);
+                const dinPartType = getDINPartType(part, category);
+                const standardQty = part.quantityPerPump * totalPumps;
+                let recommendedQty = standardQty;
+                let calculation = `Standard: ${part.quantityPerPump} × ${totalPumps} pumps = ${standardQty}`;
+                let isInterchangeable = false;
+
+                if (usedin24296 && part.sourceFiles.size > 1) {
+                    const din = getDIN24296RecommendedQty(dinPartType, totalPumps, part.quantityPerPump);
+                    recommendedQty = din.recommendedQty;
+                    calculation = din.calculation;
+                    isInterchangeable = true;
+                }
+
+                const savings = standardQty - recommendedQty;
+
+                return {
+                    ...part,
+                    sourceFiles: Array.from(part.sourceFiles),
+                    category: category,
+                    dinPartType: dinPartType,
+                    standardQty: standardQty,
+                    recommendedQty: recommendedQty,
+                    savings: savings,
+                    calculation: calculation,
+                    totalWeight: part.weight * recommendedQty,
+                    isInterchangeable: isInterchangeable,
+                    displayModel: part.pumpModels.join(', ') || 'N/A',
+                    displaySerial: part.serialNos.join(', ') || 'N/A',
+                    isCommon: part.sourceFiles.size > 1
+                };
+            });
+
+            // Filter by categories
+            const commonParts = consolidatedParts.filter(p => p.isCommon);
+
+            return {
+                all: consolidatedParts,
+                common: commonParts,
+                shafts: consolidatedParts.filter(p => p.category === 'shafts'),
+                impellers: consolidatedParts.filter(p => p.category === 'impellers'),
+                seals: consolidatedParts.filter(p => p.category === 'seals'),
+                bearings: consolidatedParts.filter(p => p.category === 'bearings'),
+                wearParts: consolidatedParts.filter(p => p.category === 'wear-parts'),
+                accessories: consolidatedParts.filter(p => p.category === 'accessories'),
+                totalPumps: totalPumps,
+                pumpList: uploadedFilesData.map(f => ({ 
+                    label: f.pumpLabel, 
+                    file: f.name,
+                    quantity: f.pumpQuantity,
+                    model: f.pumpModel,
+                    serial: f.serialNo,
+                    location: f.location
+                })),
+                din24296Enabled: usedin24296
+            };
+        }
+
+        function categorizePart(part) {
+            const designation = part.designation.toLowerCase();
+            const partNo = part.partNo.toLowerCase();
+            
+            if (designation.includes('shaft') && !designation.includes('sleeve')) {
+                return 'shafts';
+            }
+            
+            if (designation.includes('impeller')) {
+                return 'impellers';
+            }
+            
+            if (designation.includes('seal') || designation.includes('packing') || 
+                partNo.includes('433') || partNo.includes('461')) {
+                return 'seals';
+            }
+            
+            if (designation.includes('bearing') || designation.includes('bear ') ||
+                partNo.includes('320') || partNo.includes('321') || partNo.includes('322')) {
+                return 'bearings';
+            }
+            
+            if (designation.includes('wear') || designation.includes('sleeve') ||
+                designation.includes('ring') && designation.includes('wear')) {
+                return 'wear-parts';
+            }
+            
+            if (designation.includes('gasket') || designation.includes('o-ring') || 
+                partNo.includes('411') || partNo.includes('412')) {
+                return 'seals'; // Gaskets treated as sealing elements
+            }
+            
+            if (designation.includes('coupling')) {
+                return 'accessories';
+            }
+            
+            return 'accessories';
+        }
+
+        /**
+         * Map part to DIN 24296 Table 32 category
+         */
+        function getDINPartType(part, category) {
+            const designation = part.designation.toLowerCase();
+            const partNo = part.partNo.toLowerCase();
+            
+            // Shafts
+            if (category === 'shafts' || designation.includes('shaft')) {
+                return 'shaft';
+            }
+            
+            // Impellers
+            if (category === 'impellers' || designation.includes('impeller')) {
+                return 'impeller';
+            }
+            
+            // Bearings
+            if (category === 'bearings') {
+                if (designation.includes('rolling') || partNo.includes('320.02')) {
+                    return 'bearing-rolling';
+                }
+                if (designation.includes('ball') || partNo.includes('321')) {
+                    return 'bearing-ball';
+                }
+                if (designation.includes('roller') || partNo.includes('322')) {
+                    return 'bearing-roller';
+                }
+                return 'bearing-rolling'; // Default
+            }
+            
+            // Wear parts
+            if (category === 'wear-parts') {
+                if (designation.includes('wear') && designation.includes('ring')) {
+                    return 'wear-ring';
+                }
+                if (designation.includes('sleeve') || designation.includes('protect')) {
+                    return 'sleeve';
+                }
+                return 'wear-ring';
+            }
+            
+            // Seals
+            if (category === 'seals') {
+                if (designation.includes('mechanical seal') || partNo.includes('433')) {
+                    return 'seal-mechanical';
+                }
+                if (designation.includes('gland') || designation.includes('packing') || partNo.includes('461')) {
+                    return 'seal-gland';
+                }
+                if (designation.includes('gasket') || designation.includes('o-ring') || 
+                    partNo.includes('411') || partNo.includes('412') || partNo.includes('99-9')) {
+                    return 'seal-elements'; // Gaskets/O-rings = sealing elements
+                }
+                return 'seal-elements'; // Default for seals
+            }
+            
+            // Couplings
+            if (designation.includes('coupling')) {
+                return 'coupling';
+            }
+            
+            // Default
+            return 'default';
+        }
+
+        function displayResults(data, din24296Enabled) {
+            displayPumpSummary(data.pumpList, data.totalPumps);
+            
+            if (din24296Enabled) {
+                displayDINComplianceInfo(data);
+                displaySavingsCard(data);
+            } else {
+                document.getElementById('dinComplianceInfo').style.display = 'none';
+                document.getElementById('savingsCard').style.display = 'none';
+            }
+            
+            displayStatistics(data);
+            displayPartsTable('all', data.all);
+            displayCommonSparesTab(data);
+            displayPartsTable('shafts', data.shafts);
+            displayPartsTable('impellers', data.impellers);
+            displayPartsTable('seals', data.seals);
+            displayPartsTable('bearings', data.bearings);
+            displayPartsTable('wear-parts', data.wearParts);
+            displayPartsTable('accessories', data.accessories);
+            displayComparison(data);
+            updateCategoryFilter(data);
+        }
+
+        function displayPumpSummary(pumpList, totalPumps) {
+            const summaryDiv = document.getElementById('pumpSummary');
+            let html = '<h4>🏭 Pump Inventory Summary</h4>';
+            html += `<p style="margin-bottom: 15px;"><strong>Total Pumps: ${totalPumps}</strong> (Fleet size for DIN 24296 Table 32)</p>`;
+            html += '<div class="pump-list">';
+            
+            pumpList.forEach(pump => {
+                html += `
+                    <div class="pump-list-item">
+                        <strong>${pump.label}${pump.quantity > 1 ? ` (× ${pump.quantity})` : ''}</strong>
+                        <div class="pump-meta">
+                            ${pump.model ? `<span>📋 Model: ${pump.model}</span>` : ''}
+                            ${pump.serial ? `<span>🔢 S/N: ${pump.serial}</span>` : ''}
+                            ${pump.location ? `<span>📍 Location: ${pump.location}</span>` : ''}
+                            <span>📄 File: ${pump.file}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            summaryDiv.innerHTML = html;
+        }
+
+        function displayDINComplianceInfo(data) {
+            const infoDiv = document.getElementById('dinComplianceInfo');
+            infoDiv.style.display = 'block';
+
+            const interchangeableParts = data.all.filter(p => p.isInterchangeable);
+            const totalPumps = data.totalPumps;
+            
+            let fleetSizeCategory;
+            if (totalPumps >= 10) {
+                fleetSizeCategory = '10+ pumps (percentage-based calculation)';
+            } else if (totalPumps >= 8) {
+                fleetSizeCategory = '8-9 pumps';
+            } else if (totalPumps >= 6) {
+                fleetSizeCategory = '6-7 pumps';
+            } else {
+                fleetSizeCategory = `${totalPumps} pumps`;
+            }
+            
+            let html = '<h4>📋 DIN 24296 Table 32 Applied</h4>';
+            html += `<p style="margin-bottom: 15px;"><strong>Fleet Size Category:</strong> ${fleetSizeCategory}</p>`;
+            html += '<ul>';
+            html += `<li>Common parts identified: ${data.common.length}</li>`;
+            html += `<li>Parts optimized with Table 32: ${interchangeableParts.length}</li>`;
+            html += `<li>Calculation method: Official DIN 24296 lookup table</li>`;
+            html += `<li>Standard reference: DIN 24296 Section 7.7.2, Table 32</li>`;
+            html += '</ul>';
+            
+            infoDiv.innerHTML = html;
+        }
+
+        function displaySavingsCard(data) {
+            const savingsDiv = document.getElementById('savingsCard');
+            const totalStandard = data.all.reduce((sum, p) => sum + p.standardQty, 0);
+            const totalOptimized = data.all.reduce((sum, p) => sum + p.recommendedQty, 0);
+            const totalSavings = totalStandard - totalOptimized;
+            const savingsPercent = ((totalSavings / totalStandard) * 100).toFixed(1);
+
+            savingsDiv.style.display = 'block';
+            savingsDiv.innerHTML = `
+                <h4>💰 DIN 24296 Table 32 Inventory Optimization</h4>
+                <div class="savings-grid">
+                    <div class="savings-item">
+                        <h5>${totalStandard}</h5>
+                        <p>Standard Qty<br>(1:1 per pump)</p>
+                    </div>
+                    <div class="savings-item">
+                        <h5>${totalOptimized}</h5>
+                        <p>Table 32 Optimized<br>(Official DIN standard)</p>
+                    </div>
+                    <div class="savings-item">
+                        <h5>${totalSavings}</h5>
+                        <p>Parts Saved<br>(${savingsPercent}% reduction)</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayStatistics(data) {
+            const totalParts = data.all.length;
+            const commonParts = data.common.length;
+            const totalWeight = data.all.reduce((sum, p) => sum + p.totalWeight, 0);
+            const totalRecommendedQty = data.all.reduce((sum, p) => sum + p.recommendedQty, 0);
+            const standardQty = data.all.reduce((sum, p) => sum + p.standardQty, 0);
+            const savings = standardQty - totalRecommendedQty;
+
+            const statisticsDiv = document.getElementById('statistics');
+            let html = `
+                <div class="stat-card highlight">
+                    <h3>${data.totalPumps}</h3>
+                    <p>Total Pumps</p>
+                </div>
+                <div class="stat-card">
+                    <h3>${totalParts}</h3>
+                    <p>Unique Parts</p>
+                </div>
+                <div class="stat-card success">
+                    <h3>${commonParts}</h3>
+                    <p>Common Parts ⭐</p>
+                </div>
+            `;
+
+            if (data.din24296Enabled && savings > 0) {
+                html += `
+                    <div class="stat-card success">
+                        <h3>${savings}</h3>
+                        <p>Parts Saved 💰</p>
+                    </div>
+                `;
+            }
+
+            html += `
+                <div class="stat-card highlight">
+                    <h3>${totalRecommendedQty}</h3>
+                    <p>Recommended Qty</p>
+                </div>
+                <div class="stat-card">
+                    <h3>${totalWeight.toFixed(2)}</h3>
+                    <p>Total Weight (kg)</p>
+                </div>
+            `;
+
+            statisticsDiv.innerHTML = html;
+        }
+
+        function displayCommonSparesTab(data) {
+            const commonParts = data.common;
+            const highlightDiv = document.getElementById('commonSparesHighlight');
+            
+            // Summary statistics
+            const totalCommonStandard = commonParts.reduce((s, p) => s + p.standardQty, 0);
+            const totalCommonOptimized = commonParts.reduce((s, p) => s + p.recommendedQty, 0);
+            const totalCommonSavings = totalCommonStandard - totalCommonOptimized;
+            const avgUsage = (commonParts.reduce((s, p) => s + p.sourceFiles.length, 0) / commonParts.length).toFixed(1);
+
+            highlightDiv.innerHTML = `
+                <h4>⭐ Common Spares Identified (DIN 24296 Table 32)</h4>
+                <p style="margin-bottom: 15px;">Parts shared across multiple pumps, optimized using official DIN 24296 Table 32 lookup.</p>
+                <div class="common-spares-summary">
+                    <div class="common-stat">
+                        <h5>${commonParts.length}</h5>
+                        <p>Common Parts</p>
+                    </div>
+                    <div class="common-stat">
+                        <h5>${avgUsage}</h5>
+                        <p>Avg Pumps/Part</p>
+                    </div>
+                    <div class="common-stat">
+                        <h5>${totalCommonOptimized}</h5>
+                        <p>Table 32 Qty</p>
+                    </div>
+                    <div class="common-stat">
+                        <h5>${totalCommonSavings}</h5>
+                        <p>Parts Saved</p>
+                    </div>
+                </div>
+            `;
+
+            // Table
+            const table = document.getElementById('commonOnlyTable');
+            const tbody = table.querySelector('tbody');
+            tbody.innerHTML = '';
+
+            if (commonParts.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 40px;">No common parts found. All parts are unique to individual pumps.</td></tr>';
+                return;
+            }
+
+            commonParts.forEach((part, index) => {
+                const row = tbody.insertRow();
+                const qtyClass = part.isInterchangeable ? 'quantity-optimized' : 'quantity-highlight';
+                
+                row.innerHTML = `
+                    <td><strong>${index + 1}</strong></td>
+                    <td><strong>${part.partNo}</strong></td>
+                    <td>${part.materialNumber}</td>
+                    <td>${part.designation}</td>
+                    <td><span class="badge badge-common">${part.category}</span></td>
+                    <td>${part.quantityPerPump}</td>
+                    <td><strong>${part.sourceFiles.length}</strong> pumps</td>
+                    <td>${part.standardQty}</td>
+                    <td><span class="${qtyClass}">${part.recommendedQty}</span></td>
+                    <td><strong style="color: #28a745;">${part.savings > 0 ? '-' + part.savings : '0'}</strong></td>
+                    <td><small>${part.calculation}</small></td>
+                `;
+            });
+
+            // Matrix
+            displayCommonSparesMatrix(data);
+        }
+
+        function displayCommonSparesMatrix(data) {
+            const matrixDiv = document.getElementById('commonSparesMatrix');
+            const commonParts = data.common;
+            const pumps = data.pumpList;
+
+            if (commonParts.length === 0) {
+                matrixDiv.innerHTML = '<p style="text-align: center; padding: 40px; color: #666;">No common parts to display in matrix.</p>';
+                return;
+            }
+
+            let html = '<table class="parts-table"><thead><tr>';
+            html += '<th style="min-width: 150px;">Part No.</th>';
+            html += '<th style="min-width: 150px;">Material No.</th>';
+            html += '<th style="min-width: 250px;">Designation</th>';
+            html += '<th>DIN 24296 Qty</th>';
+            
+            pumps.forEach(pump => {
+                html += `<th style="min-width: 80px; text-align: center;">${pump.label}</th>`;
+            });
+            
+            html += '</tr></thead><tbody>';
+
+            commonParts.forEach(part => {
+                html += '<tr>';
+                html += `<td><strong>${part.partNo}</strong></td>`;
+                html += `<td>${part.materialNumber}</td>`;
+                html += `<td>${part.designation}</td>`;
+                const qtyClass = part.isInterchangeable ? 'quantity-optimized' : 'quantity-highlight';
+                html += `<td><span class="${qtyClass}">${part.recommendedQty}</span></td>`;
+                
+                pumps.forEach(pump => {
+                    const hasInPump = part.sourceFiles.includes(pump.label);
+                    html += `<td style="text-align: center; font-size: 1.2em; ${hasInPump ? 'background: #d4edda;' : ''}">${hasInPump ? '✓' : '-'}</td>`;
+                });
+                
+                html += '</tr>';
+            });
+
+            html += '</tbody></table>';
+            matrixDiv.innerHTML = html;
+        }
+
+        function displayPartsTable(category, parts) {
+            let tableId;
+            if (category === 'all') tableId = 'allPartsTable';
+            else if (category === 'wear-parts') tableId = 'wearPartsTable';
+            else tableId = `${category}PartsTable`;
+            
+            const table = document.getElementById(tableId);
+            if (!table) return;
+            
+            const tbody = table.querySelector('tbody');
+            tbody.innerHTML = '';
+
+            if (parts.length === 0) {
+                const colspan = table.querySelectorAll('thead th').length;
+                tbody.innerHTML = `<tr><td colspan="${colspan}" style="text-align: center; padding: 40px;">No parts in this category</td></tr>`;
+                return;
+            }
+
+            parts.forEach(part => {
+                const row = tbody.insertRow();
+                const qtyClass = part.isInterchangeable ? 'quantity-optimized' : 'quantity-highlight';
+                
+                if (category === 'all') {
+                    row.innerHTML = `
+                        <td><strong>${part.partNo}</strong></td>
+                        <td>${part.materialNumber}</td>
+                        <td>${part.designation}</td>
+                        <td><small>${part.material}</small></td>
+                        <td><small>${part.displayModel}</small></td>
+                        <td>${part.quantityPerPump}</td>
+                        <td>${part.standardQty}</td>
+                        <td><span class="${qtyClass}">${part.recommendedQty}</span></td>
+                        <td><strong>${part.savings > 0 ? '-' + part.savings : '0'}</strong></td>
+                        <td><small>${part.sourceFiles.length} pump(s)</small></td>
+                        <td><span class="badge badge-common">${part.category}</span></td>
+                        <td><small>${part.calculation}</small></td>
+                    `;
+                } else {
+                    row.innerHTML = `
+                        <td><strong>${part.partNo}</strong></td>
+                        <td>${part.materialNumber}</td>
+                        <td>${part.designation}</td>
+                        <td><small>${part.material}</small></td>
+                        <td>${part.quantityPerPump}</td>
+                        <td>${part.standardQty}</td>
+                        <td><span class="${qtyClass}">${part.recommendedQty}</span></td>
+                        <td><strong>${part.savings > 0 ? '-' + part.savings : '0'}</strong></td>
+                        <td><small>${part.sourceFiles.length} pump(s)</small></td>
+                    `;
+                }
+            });
+        }
+
+        function displayComparison(data) {
+            const comparisonDiv = document.getElementById('comparisonView');
+            const pumps = data.pumpList;
+            
+            let html = '<h3>🔄 Pump Comparison Matrix - Part Availability Across Fleet</h3>';
+            html += '<p style="margin-bottom: 20px; color: #666;">✓ = Part present | DIN 24296 Table 32 quantities shown | <strong>Export this matrix using the button above</strong></p>';
+            html += '<table class="parts-table"><thead><tr>';
+            html += '<th>Material No.</th><th>Part No.</th><th>Designation</th><th>Category</th><th>Standard Qty</th><th>DIN 24296 Qty</th>';
+            pumps.forEach(pump => {
+                html += `<th style="min-width: 100px;">${pump.label}${pump.quantity > 1 ? ` (×${pump.quantity})` : ''}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+
+            data.all.forEach(part => {
+                html += '<tr>';
+                html += `<td><strong>${part.materialNumber}</strong></td>`;
+                html += `<td>${part.partNo}</td>`;
+                html += `<td>${part.designation}</td>`;
+                html += `<td><span class="badge badge-common">${part.category}</span></td>`;
+                html += `<td>${part.standardQty}</td>`;
+                const qtyClass = part.isInterchangeable ? 'quantity-optimized' : 'quantity-highlight';
+                html += `<td><span class="${qtyClass}">${part.recommendedQty}</span></td>`;
+                pumps.forEach(pump => {
+                    const hasInPump = part.sourceFiles.includes(pump.label);
+                    html += `<td style="text-align: center; font-size: 1.2em; ${hasInPump ? 'background: #d4edda;' : ''}">${hasInPump ? '✓' : '-'}</td>`;
+                });
+                html += '</tr>';
+            });
+
+            html += '</tbody></table>';
+            comparisonDiv.innerHTML = html;
+        }
+
+        function updateCategoryFilter(data) {
+            const categories = [
+                { value: 'all', label: 'All Categories', count: data.all.length },
+                { value: 'shafts', label: 'Shafts', count: data.shafts.length },
+                { value: 'impellers', label: 'Impellers', count: data.impellers.length },
+                { value: 'seals', label: 'Seals & Gaskets', count: data.seals.length },
+                { value: 'bearings', label: 'Bearings', count: data.bearings.length },
+                { value: 'wear-parts', label: 'Wear Parts', count: data.wearParts.length },
+                { value: 'accessories', label: 'Accessories', count: data.accessories.length }
+            ];
+
+            categoryFilter.innerHTML = categories
+                .map(cat => `<option value="${cat.value}">${cat.label} (${cat.count})</option>`)
+                .join('');
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+            
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        function applyFilters() {
+            if (!analyzedData) return;
+
+            const searchTerm = searchInput.value.toLowerCase();
+            const category = categoryFilter.value;
+            const commonality = commonalityFilter.value;
+
+            let filteredData = category === 'all' ? analyzedData.all : analyzedData[category];
+
+            if (searchTerm) {
+                filteredData = filteredData.filter(part => 
+                    part.partNo.toLowerCase().includes(searchTerm) ||
+                    part.designation.toLowerCase().includes(searchTerm) ||
+                    part.materialNumber.toLowerCase().includes(searchTerm) ||
+                    part.material.toLowerCase().includes(searchTerm) ||
+                    part.displayModel.toLowerCase().includes(searchTerm) ||
+                    part.displaySerial.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            if (commonality === 'common') {
+                filteredData = filteredData.filter(part => part.sourceFiles.length > 1);
+            } else if (commonality === 'interchangeable') {
+                filteredData = filteredData.filter(part => part.isInterchangeable);
+            } else if (commonality === 'high-use') {
+                filteredData = filteredData.filter(part => part.sourceFiles.length >= 5);
+            }
+
+            const activeTab = document.querySelector('.tab.active').dataset.tab;
+            if (activeTab !== 'comparison' && activeTab !== 'common-only') {
+                displayPartsTable(activeTab, filteredData);
+            }
+        }
+
+        // Export functions (simplified - only showing key parts)
+        function exportToExcel() {
+            if (!analyzedData) {
+                alert('No data available to export!');
+                return;
+            }
+
+            const wb = XLSX.utils.book_new();
+            const summaryData = [
+                ['INTERCHANGEABLE PARTS LIST - DIN 24296 TABLE 32 COMPLIANT'],
+                ['Generated:', new Date().toLocaleString()],
+                ['Standard:', 'DIN 24296 Section 7.7.2, Table 32'],
+                ['Method:', 'Official lookup table by fleet size'],
+                [''],
+                ['FLEET SUMMARY'],
+                ['Total Pumps:', analyzedData.totalPumps],
+                ['Total Unique Parts:', analyzedData.all.length],
+                ['Common Parts:', analyzedData.common.length],
+                ['DIN 24296 Optimization:', analyzedData.din24296Enabled ? 'Enabled' : 'Disabled']
+            ];
+
+            const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
+            XLSX.utils.book_append_sheet(wb, summarySheet, 'Summary');
+
+            const allPartsData = [['Part No.', 'Material No.', 'Designation', 'Category', 'Qty/Pump', 'Standard Qty', 'DIN 24296 Qty', 'Savings', 'Found In', 'Calculation']];
+            analyzedData.all.forEach(part => {
+                allPartsData.push([
+                    part.partNo,
+                    part.materialNumber,
+                    part.designation,
+                    part.category,
+                    part.quantityPerPump,
+                    part.standardQty,
+                    part.recommendedQty,
+                    part.savings,
+                    part.sourceFiles.length + ' pumps',
+                    part.calculation
+                ]);
+            });
+
+            const allPartsSheet = XLSX.utils.aoa_to_sheet(allPartsData);
+            XLSX.utils.book_append_sheet(wb, allPartsSheet, 'All Parts');
+
+            const filename = `Interchangeable_Parts_DIN24296_${analyzedData.totalPumps}pumps_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, filename);
+        }
+
+        function exportToCSV() {
+            if (!analyzedData) {
+                alert('No data available to export!');
+                return;
+            }
+
+            let csv = 'Part No.,Material No.,Designation,Category,Qty/Pump,Standard Qty,DIN 24296 Qty,Savings,Found In,Calculation\n';
+            analyzedData.all.forEach(part => {
+                csv += `"${part.partNo}","${part.materialNumber}","${part.designation}","${part.category}",${part.quantityPerPump},${part.standardQty},${part.recommendedQty},${part.savings},"${part.sourceFiles.length} pumps","${part.calculation}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Interchangeable_Parts_DIN24296_${analyzedData.totalPumps}pumps_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+        }
+
+        function exportCommonSparesReport() {
+            if (!analyzedData || !analyzedData.common || analyzedData.common.length === 0) {
+                alert('No common spares found to export!');
+                return;
+            }
+
+            const wb = XLSX.utils.book_new();
+            const commonParts = analyzedData.common;
+
+            const summaryData = [
+                ['COMMON SPARES ONLY - DIN 24296 TABLE 32 REPORT'],
+                ['Generated:', new Date().toLocaleString()],
+                ['Standard:', 'DIN 24296 Section 7.7.2, Table 32'],
+                ['Fleet Size:', analyzedData.totalPumps + ' pumps'],
+                [''],
+                ['SUMMARY'],
+                ['Common Parts (Used in 2+ Pumps):', commonParts.length],
+                ['Total Standard Quantity:', commonParts.reduce((s, p) => s + p.standardQty, 0)],
+                ['Total DIN 24296 Quantity:', commonParts.reduce((s, p) => s + p.recommendedQty, 0)],
+                ['Total Savings:', commonParts.reduce((s, p) => s + p.savings, 0)]
+            ];
+
+            const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
+            XLSX.utils.book_append_sheet(wb, summarySheet, 'Summary');
+
+            const detailData = [['#', 'Part No.', 'Material No.', 'Designation', 'Category', 'Qty Per Pump', 'Used In (Pumps)', 'Standard Qty', 'DIN 24296 Qty', 'Savings', 'Calculation']];
+            commonParts.forEach((part, index) => {
+                detailData.push([
+                    index + 1,
+                    part.partNo,
+                    part.materialNumber,
+                    part.designation,
+                    part.category,
+                    part.quantityPerPump,
+                    part.sourceFiles.length,
+                    part.standardQty,
+                    part.recommendedQty,
+                    part.savings,
+                    part.calculation
+                ]);
+            });
+
+            const detailSheet = XLSX.utils.aoa_to_sheet(detailData);
+            XLSX.utils.book_append_sheet(wb, detailSheet, 'Common Spares List');
+
+            const filename = `Common_Spares_DIN24296_${analyzedData.totalPumps}pumps_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, filename);
+        }
+
+        function exportComparisonMatrix() {
+            if (!analyzedData) {
+                alert('No data available to export!');
+                return;
+            }
+
+            const wb = XLSX.utils.book_new();
+            const pumps = analyzedData.pumpList;
+            const allParts = analyzedData.all;
+
+            const summaryData = [
+                ['PUMP COMPARISON MATRIX - DIN 24296 TABLE 32 CROSS-REFERENCE'],
+                ['Generated:', new Date().toLocaleString()],
+                ['Total Pumps:', analyzedData.totalPumps],
+                ['Total Unique Parts:', allParts.length]
+            ];
+
+            const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
+            XLSX.utils.book_append_sheet(wb, summarySheet, 'Overview');
+
+            const matrixHeaders = ['Material No.', 'Part No.', 'Designation', 'Category', 'Standard Qty', 'DIN 24296 Qty', 'Savings'];
+            pumps.forEach(pump => matrixHeaders.push(`${pump.label}`));
+
+            const matrixData = [matrixHeaders];
+            allParts.forEach(part => {
+                const row = [
+                    part.materialNumber,
+                    part.partNo,
+                    part.designation,
+                    part.category,
+                    part.standardQty,
+                    part.recommendedQty,
+                    part.savings
+                ];
+                pumps.forEach(pump => {
+                    row.push(part.sourceFiles.includes(pump.label) ? '✓' : '-');
+                });
+                matrixData.push(row);
+            });
+
+            const matrixSheet = XLSX.utils.aoa_to_sheet(matrixData);
+            XLSX.utils.book_append_sheet(wb, matrixSheet, 'Full Comparison Matrix');
+
+            const filename = `Pump_Comparison_DIN24296_${analyzedData.totalPumps}pumps_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, filename);
+        }
+
+        function printReport() {
+            window.print();
+        }
+    </script>
+</body>
+</html>
