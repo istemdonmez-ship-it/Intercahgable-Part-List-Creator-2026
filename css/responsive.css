@@ -1,0 +1,108 @@
+/* ============================================================
+   responsive.css — Media queries
+   Mobile-first breakpoints for tablet (768px) and print
+   ============================================================ */
+
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 1.8em;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+    }
+
+    .statistics {
+        grid-template-columns: 1fr;
+    }
+
+    .parts-table {
+        font-size: 0.85em;
+    }
+
+    .parts-table th,
+    .parts-table td {
+        padding: 8px;
+    }
+
+    .pump-details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .din-category-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .export-buttons {
+        flex-direction: column;
+    }
+
+    .btn-export {
+        width: 100%;
+    }
+
+    .savings-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .common-spares-summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .tabs {
+        gap: 5px;
+    }
+
+    .tab {
+        padding: 10px 15px;
+        font-size: 0.9em;
+    }
+
+    .search-filter {
+        flex-direction: column;
+    }
+
+    .search-input {
+        min-width: unset;
+    }
+}
+
+@media print {
+    body {
+        background: #fff;
+        padding: 0;
+    }
+
+    .upload-section,
+    .info-banner,
+    .din-categories-section,
+    .interchangeable-section,
+    .action-buttons,
+    .export-buttons,
+    .search-filter,
+    .tabs,
+    .comparison-export-section {
+        display: none !important;
+    }
+
+    .container {
+        box-shadow: none;
+        border-radius: 0;
+    }
+
+    .results-section {
+        display: block !important;
+    }
+
+    .tab-content {
+        display: block !important;
+    }
+
+    .parts-table {
+        box-shadow: none;
+    }
+}

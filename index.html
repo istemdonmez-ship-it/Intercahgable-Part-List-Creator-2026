@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interchangeable Parts List Creator - DIN 24296 Compliant</title>
+
+    <!-- Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src 'self';
+                   script-src 'self';
+                   style-src 'self' 'unsafe-inline';">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/responsive.css">
+
+    <!-- Third-party libraries (bundled locally — no external CDN dependency) -->
+    <script src="js/lib/xlsx.full.min.js"></script>
+    <script src="js/lib/papaparse.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🔧 Interchangeable Parts List Creator</h1>
+            <p>Professional Edition - DIN 24296 Table 32 Compliant</p>
+        </header>
+
+        <main class="main-content">
+            <!-- DIN Standard Banner -->
+            <div class="din-standard-banner">
+                <h3>📋 DIN 24296 Standard - Table 32 Implementation</h3>
+                <p><strong>Recommended spare parts stock for 2 years' operation</strong></p>
+                <p>This tool uses the <strong>official DIN 24296 Table 32</strong> lookup methodology
+                   to calculate optimized spare parts quantities based on fleet size.
+                   Upload spare parts lists from multiple pumps to identify common, interchangeable
+                   parts and optimize your inventory.</p>
+
+                <div class="din-table-reference">
+                    <h4>📊 DIN 24296 Table 32 - Official Reference</h4>
+                    <p>Recommended stock quantities per part type and fleet size:</p>
+                    <table class="din-reference-table" aria-label="DIN 24296 Table 32 reference">
+                        <thead>
+                            <tr>
+                                <th>Part Type</th>
+                                <th>2 Pumps</th>
+                                <th>3 Pumps</th>
+                                <th>4 Pumps</th>
+                                <th>5 Pumps</th>
+                                <th>6–7 Pumps</th>
+                                <th>8–9 Pumps</th>
+                                <th>10+ Pumps</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Shaft / Impeller</td><td>1</td><td>1</td><td>1</td><td>2</td><td>2</td><td>2</td><td>20%</td></tr>
+                            <tr><td>Rolling Bearing</td><td>1</td><td>1</td><td>2</td><td>2</td><td>3</td><td>3</td><td>25%</td></tr>
+                            <tr><td>Wear Ring / Sleeve</td><td>2</td><td>2</td><td>2</td><td>3</td><td>4</td><td>4</td><td>50%</td></tr>
+                            <tr><td>Mechanical Seal</td><td>1</td><td>1</td><td>2</td><td>2</td><td>3</td><td>3</td><td>25%</td></tr>
+                            <tr><td>Sealing Elements</td><td>4</td><td>6</td><td>8</td><td>8</td><td>12</td><td>12</td><td>150%</td></tr>
+                            <tr><td>Gland Packing</td><td>4</td><td>4</td><td>6</td><td>6</td><td>8</td><td>8</td><td>100%</td></tr>
+                            <tr><td>Coupling</td><td>1</td><td>1</td><td>2</td><td>2</td><td>4</td><td>4</td><td>30%</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Info Banner -->
+            <div class="info-banner" role="note">
+                <div class="info-banner-icon" aria-hidden="true">💡</div>
+                <div class="info-banner-text">
+                    <h3>How to use this tool</h3>
+                    <p>
+                        Upload spare parts lists (Excel or CSV) for each pump in your fleet.
+                        The tool will automatically identify common parts, apply DIN 24296 Table 32
+                        quantities, and calculate inventory savings when parts are shared across pumps.
+                    </p>
+                </div>
+            </div>
+
+            <!-- File Upload Section -->
+            <section class="upload-section" id="uploadSection"
+                     aria-label="File upload area - drag and drop or click to select files">
+                <div class="empty-state-icon" aria-hidden="true">📁</div>
+                <h3>Upload Pump Spare Parts Files</h3>
+                <p>Drag &amp; drop CSV or Excel files here, or click to select</p>
+                <p><small>Supported formats: .csv, .xlsx, .xls &mdash; Maximum file size: 10 MB</small></p>
+                <div class="file-input-wrapper">
+                    <input type="file" id="fileInput" class="file-input"
+                           multiple accept=".csv,.xlsx,.xls"
+                           aria-label="Select spare parts data files">
+                    <label for="fileInput" class="file-input-button">Choose Files</label>
+                </div>
+                <div class="uploaded-files" id="uploadedFiles" aria-live="polite"></div>
+            </section>
+
+            <!-- DIN Categories Info -->
+            <section class="din-categories-section" id="dinCategoriesSection" style="display:none"
+                     aria-labelledby="dinCategoriesHeading">
+                <h3 id="dinCategoriesHeading">⚙️ DIN 24296 Part Categories</h3>
+                <div class="din-info-text">
+                    Parts are automatically classified into three DIN 24296 categories based on
+                    their designation and part number. The system uses the official Table 32 lookup
+                    to recommend stock quantities.
+                </div>
+                <div class="din-category-grid">
+                    <!-- Category A: Shafts & Impellers -->
+                    <div class="din-category-card">
+                        <div class="din-category-header">
+                            <div class="din-category-icon" aria-hidden="true">🔴</div>
+                            <div class="din-category-title">
+                                <h4>Rotating Parts (Shafts, Impellers)</h4>
+                                <div class="din-category-subtitle">High Consumption | 50–150% Stock</div>
+                            </div>
+                        </div>
+                        <div class="din-category-description">
+                            Critical rotating components subject to wear and fatigue.
+                            High stock levels required due to long lead times and critical nature.
+                        </div>
+                        <div class="din-recommendation">Table 32: 1 pc for 2–4 pumps | 2 pcs for 5–9 pumps | 20% for 10+</div>
+                        <div class="din-examples">
+                            <strong>Examples:</strong>
+                            Pump shaft, impeller, shaft sleeve, balance disc
+                        </div>
+                    </div>
+                    <!-- Category B: Bearings & Seals -->
+                    <div class="din-category-card">
+                        <div class="din-category-header">
+                            <div class="din-category-icon" aria-hidden="true">🟡</div>
+                            <div class="din-category-title">
+                                <h4>Bearings &amp; Sealing Components</h4>
+                                <div class="din-category-subtitle">Predictable Life | 20–30% Stock</div>
+                            </div>
+                        </div>
+                        <div class="din-category-description">
+                            Components with predictable service life requiring scheduled replacement.
+                            Stock based on fleet size to ensure availability during maintenance windows.
+                        </div>
+                        <div class="din-recommendation">Table 32: 1 pc for 2–3 pumps | 2–3 pcs for 4–9 pumps | 25% for 10+</div>
+                        <div class="din-examples">
+                            <strong>Examples:</strong>
+                            Rolling bearings, ball bearings, mechanical seals, wear rings
+                        </div>
+                    </div>
+                    <!-- Category C: Sealing Elements & Gaskets -->
+                    <div class="din-category-card">
+                        <div class="din-category-header">
+                            <div class="din-category-icon" aria-hidden="true">🟢</div>
+                            <div class="din-category-title">
+                                <h4>Sealing Elements &amp; Gaskets</h4>
+                                <div class="din-category-subtitle">Scheduled Replacement | 25% Stock</div>
+                            </div>
+                        </div>
+                        <div class="din-category-description">
+                            Consumable sealing components replaced at every overhaul.
+                            High stock quantities required as complete sets are needed for each maintenance.
+                        </div>
+                        <div class="din-recommendation">Table 32: 4–6 sets for 2–3 pumps | 8–12 sets for 4–9 pumps | 150% for 10+</div>
+                        <div class="din-examples">
+                            <strong>Examples:</strong>
+                            O-rings, gaskets, packing sets, gland packing, sealing kits
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Interchangeable Parts Toggle -->
+            <section class="interchangeable-section" id="interchangeableSection" style="display:none"
+                     aria-labelledby="interchangeableHeading">
+                <h3 id="interchangeableHeading">🔄 Interchangeable Parts Analysis</h3>
+                <div class="info-text">
+                    <p>When enabled, parts found in multiple pumps will use <strong>DIN 24296 Table 32</strong>
+                       quantities instead of multiplying by the number of pumps. This can significantly
+                       reduce your required stock when pumps share common parts.</p>
+                    <p>For example: 3 pumps × 1 mechanical seal each = 3 standard | DIN 24296 = 1 optimized</p>
+                </div>
+                <div class="interchangeable-toggle">
+                    <div class="toggle-switch" id="interchangeableToggle"
+                         role="switch" aria-checked="false"
+                         aria-label="Enable DIN 24296 interchangeable parts optimization"
+                         tabindex="0">
+                        <div class="toggle-slider"></div>
+                    </div>
+                    <span><strong>Enable DIN 24296 Table 32 optimization</strong> (recommended for fleets with common parts)</span>
+                </div>
+            </section>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="analyzeButton" disabled
+                        aria-label="Analyze uploaded parts files">
+                    🔍 Analyze Parts
+                </button>
+                <button class="btn btn-secondary" id="clearButton" disabled
+                        aria-label="Clear all uploaded files and results">
+                    🗑️ Clear All
+                </button>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div class="loading" id="loading" role="status" aria-live="polite">
+                <div class="spinner" aria-hidden="true"></div>
+                <p>Analyzing parts data and applying DIN 24296 Table 32...</p>
+            </div>
+
+            <!-- Results Section -->
+            <section class="results-section" id="resultsSection" aria-label="Analysis results">
+                <!-- Pump Summary -->
+                <div class="pump-summary" id="pumpSummary" aria-live="polite"></div>
+
+                <!-- DIN Compliance Info -->
+                <div class="din-compliance-info" id="dinComplianceInfo" style="display:none"></div>
+
+                <!-- Savings Card -->
+                <div class="savings-card" id="savingsCard" style="display:none"></div>
+
+                <!-- Statistics Cards -->
+                <div class="statistics" id="statistics" aria-label="Summary statistics"></div>
+
+                <!-- Search & Filter -->
+                <div class="search-filter">
+                    <label for="searchInput" class="sr-only">Search parts</label>
+                    <input type="text" class="search-input" id="searchInput"
+                           placeholder="🔍 Search by part number, designation, material, or serial..."
+                           aria-label="Search parts">
+                    <label for="categoryFilter" class="sr-only">Filter by category</label>
+                    <select class="filter-select" id="categoryFilter" aria-label="Filter by category">
+                        <option value="all">All Categories</option>
+                    </select>
+                    <label for="commonalityFilter" class="sr-only">Filter by commonality</label>
+                    <select class="filter-select" id="commonalityFilter" aria-label="Filter by commonality">
+                        <option value="all">All Parts</option>
+                        <option value="common">Common Parts Only (2+ Pumps)</option>
+                        <option value="interchangeable">DIN 24296 Optimized</option>
+                        <option value="high-use">High-Use (5+ Pumps)</option>
+                    </select>
+                </div>
+
+                <!-- Export Buttons -->
+                <div class="export-buttons">
+                    <button class="btn-export btn-excel" id="exportExcel"
+                            aria-label="Export all parts to Excel">
+                        📊 Export Excel (All Parts)
+                    </button>
+                    <button class="btn-export btn-csv" id="exportCSV"
+                            aria-label="Export all parts to CSV">
+                        📄 Export CSV
+                    </button>
+                    <button class="btn-export btn-common-report" id="exportCommonReport"
+                            aria-label="Export common spares report to Excel">
+                        ⭐ Common Spares Report
+                    </button>
+                    <button class="btn-export btn-comparison-report" id="exportComparisonReport"
+                            aria-label="Export pump comparison matrix to Excel">
+                        🔄 Comparison Matrix
+                    </button>
+                    <button class="btn-export btn-pdf" id="exportPDF"
+                            aria-label="Print or save as PDF">
+                        🖨️ Print / PDF
+                    </button>
+                </div>
+
+                <!-- Tabs -->
+                <nav class="tabs" role="tablist" aria-label="Parts categories">
+                    <button class="tab active" data-tab="all" role="tab" aria-selected="true">All Parts</button>
+                    <button class="tab" data-tab="common-only" role="tab" aria-selected="false">⭐ Common Spares</button>
+                    <button class="tab" data-tab="shafts" role="tab" aria-selected="false">Shafts</button>
+                    <button class="tab" data-tab="impellers" role="tab" aria-selected="false">Impellers</button>
+                    <button class="tab" data-tab="seals" role="tab" aria-selected="false">Seals</button>
+                    <button class="tab" data-tab="bearings" role="tab" aria-selected="false">Bearings</button>
+                    <button class="tab" data-tab="wear-parts" role="tab" aria-selected="false">Wear Parts</button>
+                    <button class="tab" data-tab="accessories" role="tab" aria-selected="false">Accessories</button>
+                    <button class="tab" data-tab="comparison" role="tab" aria-selected="false">Pump Comparison</button>
+                </nav>
+
+                <!-- Tab: All Parts -->
+                <div class="tab-content active" id="tab-all" role="tabpanel">
+                    <table class="parts-table" id="allPartsTable" aria-label="All parts">
+                        <thead>
+                            <tr>
+                                <th>Part No.</th>
+                                <th>Material No.</th>
+                                <th>Designation</th>
+                                <th>Material</th>
+                                <th>Model</th>
+                                <th>Qty/Pump</th>
+                                <th>Standard Qty</th>
+                                <th>DIN 24296 Qty</th>
+                                <th>Savings</th>
+                                <th>Found In</th>
+                                <th>Category</th>
+                                <th>Calculation</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <!-- Tab: Common Spares -->
+                <div class="tab-content" id="tab-common-only" role="tabpanel">
+                    <div class="common-spares-highlight" id="commonSparesHighlight"></div>
+                    <div class="pump-availability-matrix" id="commonSparesMatrix"></div>
+                    <table class="parts-table" id="commonOnlyTable" aria-label="Common spare parts">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Part No.</th>
+                                <th>Material No.</th>
+                                <th>Designation</th>
+                                <th>Category</th>
+                                <th>Qty/Pump</th>
+                                <th>Used In</th>
+                                <th>Standard Qty</th>
+                                <th>DIN 24296 Qty</th>
+                                <th>Savings</th>
+                                <th>Calculation</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <!-- Tab: Shafts -->
+                <div class="tab-content" id="tab-shafts" role="tabpanel">
+                    <div class="din-calculation-note">
+                        <strong>DIN 24296 Table 32 — Shafts:</strong>
+                        1 pc for 2–4 pumps | 2 pcs for 5–9 pumps | 20% of fleet for 10+ pumps
+                    </div>
+                    <table class="parts-table" id="shaftsPartsTable" aria-label="Shaft parts">
+                        <thead>
+                            <tr>
+                                <th>Part No.</th>
+                                <th>Material No.</th>
+                                <th>Designation</th>
+                                <th>Material</th>
+                                <th>Qty/Pump</th>
+                                <th>Standard Qty</th>
+                                <th>DIN 24296 Qty</th>
+                                <th>Savings</th>
+                                <th>Found In</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <!-- Tab: Impellers -->
+                <div class="tab-content" id="tab-impellers" role="tabpanel">
+                    <div class="din-calculation-note">
+                        <strong>DIN 24296 Table 32 — Impellers:</strong>
+                        1 pc for 2–4 pumps | 2 pcs for 5–9 pumps | 20% of fleet for 10+ pumps
+                    </div>
+                    <table class="parts-table" id="impellersPartsTable" aria-label="Impeller parts">
+                        <thead>
+                            <tr>
+                                <th>Part No.</th>
+                                <th>Material No.</th>
+                                <th>Designation</th>
+                                <th>Material</th>
+                                <th>Qty/Pump</th>
+                                <th>Standard Qty</th>
+                                <th>DIN 24296 Qty</th>
+                                <th>Savings</th>
+                                <th>Found In</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <!-- Tab: Seals -->
+                <div class="tab-content" id="tab-seals" role="tabpanel">
+                    <div class="din-calculation-note">
+                        <strong>DIN 24296 Table 32 — Sealing Elements:</strong>
+                        4 sets for 2 pumps | 6–8 sets for 3–4 pumps | 12 sets for 8+ pumps | 150% for 10+
+                    </div>
+                    <table class="parts-table" id="sealsPartsTable" aria-label="Seal parts">
+                        <thead>
+                            <tr>
+                                <th>Part No.</th>
+                                <th>Material No.</th>
+                                <th>Designation</th>
+                                <th>Material</th>
+                                <th>Qty/Pump</th>
+                                <th>Standard Qty</th>
+                                <th>DIN 24296 Qty</th>
+                                <th>Savings</th>
+                                <th>Found In</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <!-- Tab: Bearings -->
+                <div class="tab-content" id="tab-bearings" role="tabpanel">
+                    <div class="din-calculation-note">
+                        <strong>DIN 24296 Table 32 — Rolling Bearings:</strong>
+                        1 pc for 2–3 pumps | 2 pcs for 4–7 pumps | 3 pcs for 8–9 pumps | 25% for 10+
+                    </div>
+                    <table class="parts-table" id="bearingsPartsTable" aria-label="Bearing parts">
+                        <thead>
+                            <tr>
+                                <th>Part No.</th>
+                                <th>Material No.</th>
+                                <th>Designation</th>
+                                <th>Material</th>
+                                <th>Qty/Pump</th>
+                                <th>Standard Qty</th>
+                                <th>DIN 24296 Qty</th>
+                                <th>Savings</th>
+                                <th>Found In</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <!-- Tab: Wear Parts -->
+                <div class="tab-content" id="tab-wear-parts" role="tabpanel">
+                    <div class="din-calculation-note">
+                        <strong>DIN 24296 Table 32 — Wear Rings / Sleeves:</strong>
+                        2 pcs for 2–4 pumps | 3–4 pcs for 5–9 pumps | 50% for 10+
+                    </div>
+                    <table class="parts-table" id="wearPartsTable" aria-label="Wear parts">
+                        <thead>
+                            <tr>
+                                <th>Part No.</th>
+                                <th>Material No.</th>
+                                <th>Designation</th>
+                                <th>Material</th>
+                                <th>Qty/Pump</th>
+                                <th>Standard Qty</th>
+                                <th>DIN 24296 Qty</th>
+                                <th>Savings</th>
+                                <th>Found In</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <!-- Tab: Accessories -->
+                <div class="tab-content" id="tab-accessories" role="tabpanel">
+                    <table class="parts-table" id="accessoriesPartsTable" aria-label="Accessory parts">
+                        <thead>
+                            <tr>
+                                <th>Part No.</th>
+                                <th>Material No.</th>
+                                <th>Designation</th>
+                                <th>Material</th>
+                                <th>Qty/Pump</th>
+                                <th>Standard Qty</th>
+                                <th>DIN 24296 Qty</th>
+                                <th>Savings</th>
+                                <th>Found In</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <!-- Tab: Pump Comparison -->
+                <div class="tab-content" id="tab-comparison" role="tabpanel">
+                    <div class="comparison-export-section">
+                        <h4>🔄 Export Pump Comparison Matrix</h4>
+                        <p>
+                            <strong>Comprehensive cross-reference report</strong> showing which parts
+                            are present in each pump. Perfect for maintenance planning and identifying
+                            interchangeable components across your fleet.
+                        </p>
+                        <button class="btn-export btn-comparison-report"
+                                onclick="document.getElementById('exportComparisonReport').click()"
+                                aria-label="Export comparison matrix to Excel">
+                            📊 Export Comparison Matrix to Excel
+                        </button>
+                    </div>
+                    <div class="comparison-view" id="comparisonView"></div>
+                </div>
+            </section><!-- /results-section -->
+        </main>
+    </div><!-- /container -->
+
+    <!-- Application modules (order matters: utils → handlers → modules → app) -->
+    <script src="js/utils.js"></script>
+    <script src="js/fileHandler.js"></script>
+    <script src="js/dinClassifier.js"></script>
+    <script src="js/dataProcessor.js"></script>
+    <script src="js/exportManager.js"></script>
+    <script src="js/uiController.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
