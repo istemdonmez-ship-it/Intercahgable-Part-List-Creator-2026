@@ -322,7 +322,7 @@ Structure:
 ```
 Indices 2–5 are for fleets of exactly 2–5 pumps.
 Index 7 is for 6–7 pumps; index 8 for 8–9 pumps.
-Index 9 is a percentage used for 10+ pumps.
+Index 9 is a decimal multiplier used for 10+ pumps (e.g. 0.20 = 20% of fleet).
 
 ---
 

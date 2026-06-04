@@ -135,7 +135,7 @@ CSV files should use semicolons (`;`) as delimiter. Excel files (.xlsx / .xls) s
 | [SheetJS (XLSX)](https://sheetjs.com/) | 0.18.5 | Excel parsing and export |
 | [PapaParse](https://www.papaparse.com/) | 5.4.1 | CSV parsing |
 
-No build tools, bundlers, or package managers are required. All dependencies are loaded from CDN.
+No build tools, bundlers, or package managers are required. All dependencies are bundled locally in `js/lib/`.
 
 ---
 
