@@ -245,13 +245,13 @@ function exportComparisonMatrix(analyzedData) {
         /* Add serial number row under pump headers */
         const serialNumberRow = [
             ...Array(FIXED_COLUMN_COUNT).fill(''),
-            ...pumpList.map((p) => sanitizeString(p.serial) || 'N/A'),
+            ...pumpList.map((p) => sanitizeString(p.serial || 'N/A')),
         ];
         
         /* Add model row under pump headers */
         const modelRow = [
             ...Array(FIXED_COLUMN_COUNT).fill(''),
-            ...pumpList.map((p) => sanitizeString(p.model) || 'N/A'),
+            ...pumpList.map((p) => sanitizeString(p.model || 'N/A')),
         ];
         
         const matrixRows = allParts.map((part) => {
