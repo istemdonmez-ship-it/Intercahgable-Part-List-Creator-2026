@@ -184,6 +184,29 @@ function throttle(fn, limit) {
     };
 }
 
+/**
+ * Format a pump header display name with optional serial number.
+ * @param {object} pump - Pump object with model, serial, and label properties.
+ * @param {boolean} includeSerial - Whether to include serial number in the output.
+ * @param {boolean} asHTML - Whether to format as HTML (with <br> tags) or plain text.
+ * @returns {string} Formatted pump header.
+ */
+function formatPumpHeader(pump, includeSerial = true, asHTML = true) {
+    const displayName = pump.model && pump.model !== 'N/A' ? pump.model : pump.label;
+    const sanitizedName = sanitizeString(displayName);
+    
+    if (!includeSerial || !pump.serial || pump.serial === 'N/A') {
+        return sanitizedName;
+    }
+    
+    const sanitizedSerial = sanitizeString(pump.serial);
+    if (asHTML) {
+        return `${sanitizedName}<br><small>SN: ${sanitizedSerial}</small>`;
+    } else {
+        return `${sanitizedName} (SN: ${sanitizedSerial})`;
+    }
+}
+
 /* ============================================================
    CSV escaping
    ============================================================ */

@@ -1947,6 +1947,22 @@
             return div.innerHTML;
         }
 
+        function formatPumpHeader(pump, includeSerial = true, asHTML = true) {
+            const displayName = pump.model && pump.model !== 'N/A' ? pump.model : pump.label;
+            const sanitizedName = escapeHtml(displayName);
+            
+            if (!includeSerial || !pump.serial || pump.serial === 'N/A') {
+                return sanitizedName;
+            }
+            
+            const sanitizedSerial = escapeHtml(pump.serial);
+            if (asHTML) {
+                return `${sanitizedName}<br><small>SN: ${sanitizedSerial}</small>`;
+            } else {
+                return `${sanitizedName} (SN: ${sanitizedSerial})`;
+            }
+        }
+
         async function analyzeParts() {
             loading.classList.add('active');
             resultsSection.style.display = 'none';
@@ -2515,9 +2531,7 @@
             html += '<th>DIN 24296 Qty</th>';
             
             pumps.forEach(pump => {
-                const displayName = pump.model && pump.model !== 'N/A' ? pump.model : pump.label;
-                const serialInfo = pump.serial && pump.serial !== 'N/A' ? `<br><small>SN: ${escapeHtml(pump.serial)}</small>` : '';
-                html += `<th style="min-width: 80px; text-align: center;">${escapeHtml(displayName)}${serialInfo}</th>`;
+                html += `<th style="min-width: 80px; text-align: center;">${formatPumpHeader(pump)}</th>`;
             });
             
             html += '</tr></thead><tbody>';
@@ -2604,9 +2618,7 @@
             html += '<table class="parts-table"><thead><tr>';
             html += '<th>Material No.</th><th>Part No.</th><th>Designation</th><th>Category</th><th>Standard Qty</th><th>DIN 24296 Qty</th>';
             pumps.forEach(pump => {
-                const displayName = pump.model && pump.model !== 'N/A' ? pump.model : pump.label;
-                const serialInfo = pump.serial && pump.serial !== 'N/A' ? `<br><small>SN: ${escapeHtml(pump.serial)}</small>` : '';
-                html += `<th style="min-width: 100px;">${escapeHtml(displayName)}${serialInfo}${pump.quantity > 1 ? ` (×${pump.quantity})` : ''}</th>`;
+                html += `<th style="min-width: 100px;">${formatPumpHeader(pump)}${pump.quantity > 1 ? ` (×${pump.quantity})` : ''}</th>`;
             });
             html += '</tr></thead><tbody>';
 
@@ -2825,9 +2837,7 @@
 
             const matrixHeaders = ['Material No.', 'Part No.', 'Designation', 'Category', 'Standard Qty', 'DIN 24296 Qty', 'Savings'];
             pumps.forEach(pump => {
-                const displayName = pump.model && pump.model !== 'N/A' ? pump.model : pump.label;
-                const serialInfo = pump.serial && pump.serial !== 'N/A' ? ` (SN: ${pump.serial})` : '';
-                matrixHeaders.push(displayName + serialInfo);
+                matrixHeaders.push(formatPumpHeader(pump, true, false));
             });
 
             const matrixData = [matrixHeaders];

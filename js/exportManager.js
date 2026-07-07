@@ -229,11 +229,7 @@ function exportComparisonMatrix(analyzedData) {
         const matrixHeaders = [
             'Material No.', 'Part No.', 'Designation', 'Category',
             'Standard Qty', 'DIN 24296 Qty', 'Savings',
-            ...pumpList.map((p) => {
-                const displayName = p.model && p.model !== 'N/A' ? p.model : p.label;
-                const serialInfo = p.serial && p.serial !== 'N/A' ? ` (SN: ${p.serial})` : '';
-                return displayName + serialInfo;
-            }),
+            ...pumpList.map((p) => formatPumpHeader(p, true, false)),
         ];
         const matrixRows = allParts.map((part) => {
             const pumpCols = pumpList.map((pump) =>
