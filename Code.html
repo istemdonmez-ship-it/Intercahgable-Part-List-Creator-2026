@@ -1868,9 +1868,12 @@
 
         // Metadata input handling
         Object.keys(projectMetadata).forEach(fieldId => {
-            document.getElementById(fieldId).addEventListener('input', (e) => {
-                projectMetadata[fieldId] = e.target.value;
-            });
+            const element = document.getElementById(fieldId);
+            if (element) {
+                element.addEventListener('input', (e) => {
+                    projectMetadata[fieldId] = e.target.value;
+                });
+            }
         });
 
         // Export buttons
