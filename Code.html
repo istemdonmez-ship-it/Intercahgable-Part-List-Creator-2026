@@ -1941,6 +1941,12 @@
             return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
         }
 
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         async function analyzeParts() {
             loading.classList.add('active');
             resultsSection.style.display = 'none';
@@ -2510,8 +2516,8 @@
             
             pumps.forEach(pump => {
                 const displayName = pump.model && pump.model !== 'N/A' ? pump.model : pump.label;
-                const serialInfo = pump.serial && pump.serial !== 'N/A' ? `<br><small>SN: ${pump.serial}</small>` : '';
-                html += `<th style="min-width: 80px; text-align: center;">${displayName}${serialInfo}</th>`;
+                const serialInfo = pump.serial && pump.serial !== 'N/A' ? `<br><small>SN: ${escapeHtml(pump.serial)}</small>` : '';
+                html += `<th style="min-width: 80px; text-align: center;">${escapeHtml(displayName)}${serialInfo}</th>`;
             });
             
             html += '</tr></thead><tbody>';
@@ -2599,8 +2605,8 @@
             html += '<th>Material No.</th><th>Part No.</th><th>Designation</th><th>Category</th><th>Standard Qty</th><th>DIN 24296 Qty</th>';
             pumps.forEach(pump => {
                 const displayName = pump.model && pump.model !== 'N/A' ? pump.model : pump.label;
-                const serialInfo = pump.serial && pump.serial !== 'N/A' ? `<br><small>SN: ${pump.serial}</small>` : '';
-                html += `<th style="min-width: 100px;">${displayName}${serialInfo}${pump.quantity > 1 ? ` (×${pump.quantity})` : ''}</th>`;
+                const serialInfo = pump.serial && pump.serial !== 'N/A' ? `<br><small>SN: ${escapeHtml(pump.serial)}</small>` : '';
+                html += `<th style="min-width: 100px;">${escapeHtml(displayName)}${serialInfo}${pump.quantity > 1 ? ` (×${pump.quantity})` : ''}</th>`;
             });
             html += '</tr></thead><tbody>';
 
