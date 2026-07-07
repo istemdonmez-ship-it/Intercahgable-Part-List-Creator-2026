@@ -130,7 +130,6 @@ function displayPumpSummary(pumpList, totalPumps) {
             <div class="pump-list-item">
                 <strong>${displayLabel}${pump.quantity > 1 ? ` (× ${pump.quantity})` : ''}</strong>
                 <div class="pump-meta">
-                    ${pump.model    ? `<span>📋 Model: ${sanitizeString(pump.model)}</span>`      : ''}
                     ${pump.serial   ? `<span>🔢 S/N: ${sanitizeString(pump.serial)}</span>`       : ''}
                     ${pump.location ? `<span>📍 Location: ${sanitizeString(pump.location)}</span>`: ''}
                     <span>📄 File: ${sanitizeString(pump.file)}</span>
