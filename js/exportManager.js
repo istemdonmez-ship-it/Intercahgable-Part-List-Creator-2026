@@ -10,6 +10,28 @@
    ============================================================ */
 
 /**
+ * Build project information rows for Excel exports.
+ * @param {object} pumpList - Array of pump objects from analyzedData
+ * @returns {Array[]} AoA rows with project information or empty array if no data.
+ */
+function buildProjectInfoRows(pumpList) {
+    if (!pumpList || pumpList.length === 0) {
+        return [];
+    }
+
+    const firstPump = pumpList[0];
+    const rows = [[''], ['PROJECT INFORMATION']];
+    
+    if (firstPump.ksbReferenceNumber) rows.push(['KSB Reference Number:', firstPump.ksbReferenceNumber]);
+    if (firstPump.preparedBy) rows.push(['Prepared By:', firstPump.preparedBy]);
+    if (firstPump.endUserName) rows.push(['End User Name:', firstPump.endUserName]);
+    if (firstPump.endUserNumber) rows.push(['End User Number:', firstPump.endUserNumber]);
+    if (firstPump.installationPointNumber) rows.push(['Installation Point Number:', firstPump.installationPointNumber]);
+    
+    return rows;
+}
+
+/**
  * Build a generic DIN 24296 header block for Excel workbooks.
  * @param {object} analyzedData
  * @returns {Array[]} AoA rows for the summary sheet.
@@ -29,16 +51,7 @@ function buildSummaryAoA(analyzedData) {
     ];
 
     /* Add project information if available */
-    if (analyzedData.pumpList && analyzedData.pumpList.length > 0) {
-        const firstPump = analyzedData.pumpList[0];
-        summaryRows.push(['']);
-        summaryRows.push(['PROJECT INFORMATION']);
-        if (firstPump.ksbReferenceNumber) summaryRows.push(['KSB Reference Number:', firstPump.ksbReferenceNumber]);
-        if (firstPump.preparedBy) summaryRows.push(['Prepared By:', firstPump.preparedBy]);
-        if (firstPump.endUserName) summaryRows.push(['End User Name:', firstPump.endUserName]);
-        if (firstPump.endUserNumber) summaryRows.push(['End User Number:', firstPump.endUserNumber]);
-        if (firstPump.installationPointNumber) summaryRows.push(['Installation Point Number:', firstPump.installationPointNumber]);
-    }
+    summaryRows.push(...buildProjectInfoRows(analyzedData.pumpList));
 
     return summaryRows;
 }
@@ -177,16 +190,7 @@ function exportCommonSparesReport(analyzedData) {
         ];
 
         /* Add project information if available */
-        if (analyzedData.pumpList && analyzedData.pumpList.length > 0) {
-            const firstPump = analyzedData.pumpList[0];
-            summaryAoA.push(['']);
-            summaryAoA.push(['PROJECT INFORMATION']);
-            if (firstPump.ksbReferenceNumber) summaryAoA.push(['KSB Reference Number:', firstPump.ksbReferenceNumber]);
-            if (firstPump.preparedBy) summaryAoA.push(['Prepared By:', firstPump.preparedBy]);
-            if (firstPump.endUserName) summaryAoA.push(['End User Name:', firstPump.endUserName]);
-            if (firstPump.endUserNumber) summaryAoA.push(['End User Number:', firstPump.endUserNumber]);
-            if (firstPump.installationPointNumber) summaryAoA.push(['Installation Point Number:', firstPump.installationPointNumber]);
-        }
+        summaryAoA.push(...buildProjectInfoRows(analyzedData.pumpList));
 
         XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summaryAoA), 'Summary');
 
@@ -252,16 +256,7 @@ function exportComparisonMatrix(analyzedData) {
         ];
 
         /* Add project information if available */
-        if (pumpList && pumpList.length > 0) {
-            const firstPump = pumpList[0];
-            overviewAoA.push(['']);
-            overviewAoA.push(['PROJECT INFORMATION']);
-            if (firstPump.ksbReferenceNumber) overviewAoA.push(['KSB Reference Number:', firstPump.ksbReferenceNumber]);
-            if (firstPump.preparedBy) overviewAoA.push(['Prepared By:', firstPump.preparedBy]);
-            if (firstPump.endUserName) overviewAoA.push(['End User Name:', firstPump.endUserName]);
-            if (firstPump.endUserNumber) overviewAoA.push(['End User Number:', firstPump.endUserNumber]);
-            if (firstPump.installationPointNumber) overviewAoA.push(['Installation Point Number:', firstPump.installationPointNumber]);
-        }
+        overviewAoA.push(...buildProjectInfoRows(pumpList));
 
         XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(overviewAoA), 'Overview');
 
