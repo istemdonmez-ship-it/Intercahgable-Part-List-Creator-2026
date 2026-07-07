@@ -6,7 +6,9 @@
 'use strict';
 
 /** Maximum allowed file size in bytes (10 MB). */
-const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
+const MAX_FILE_SIZE_BYTES = (typeof FILE_LIMITS !== 'undefined') 
+    ? FILE_LIMITS.maxSizeBytes 
+    : 10 * 1024 * 1024;
 
 /**
  * Process an array of File objects:

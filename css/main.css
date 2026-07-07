@@ -4,38 +4,57 @@
    ============================================================ */
 
 :root {
-    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* KSB Brand Colors */
+    --ksb-primary: #0066CC;
+    --ksb-secondary: #003D7A;
+    --ksb-accent: #00A0DC;
+    --ksb-light: #E6F2FF;
+    
+    /* Gradients with KSB Branding */
+    --gradient-primary: linear-gradient(135deg, #0066CC 0%, #003D7A 100%);
     --gradient-danger: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
     --gradient-success: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-    --gradient-highlight: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --gradient-highlight: linear-gradient(135deg, #00A0DC 0%, #0066CC 100%);
     --gradient-info: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
 
-    --color-primary: #667eea;
-    --color-secondary: #764ba2;
+    /* Standard Colors (updated with KSB palette) */
+    --color-primary: #0066CC;
+    --color-secondary: #003D7A;
     --color-danger: #ee5a6f;
     --color-success: #28a745;
     --color-warning: #ffc107;
-    --color-info: #17a2b8;
+    --color-info: #00A0DC;
 
+    /* Text Colors */
     --color-text: #333;
     --color-text-muted: #666;
+    --color-text-light: #999;
     --color-border: #e0e0e0;
     --color-bg-light: #f8f9fa;
 
+    /* Border Radius */
     --border-radius-sm: 5px;
     --border-radius-md: 10px;
     --border-radius-lg: 15px;
     --border-radius-pill: 50px;
 
+    /* Shadows */
     --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.1);
     --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.2);
     --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.3);
+    --shadow-hover: 0 8px 25px rgba(0, 102, 204, 0.2);
 
+    /* Spacing */
     --spacing-xs: 5px;
     --spacing-sm: 10px;
     --spacing-md: 20px;
     --spacing-lg: 30px;
     --spacing-xl: 40px;
+    
+    /* Transitions */
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
 }
 
 /* ---- Reset ---- */
@@ -224,4 +243,119 @@ body {
 @keyframes spin {
     0%   { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   KSB Branding Styles
+   ============================================================ */
+
+/* ---- KSB Header Branding ---- */
+.header-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.brand-logo {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: 1.5em;
+    font-weight: 700;
+    margin-bottom: var(--spacing-sm);
+}
+
+.brand-icon {
+    font-size: 1.5em;
+}
+
+.brand-name {
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.subtitle {
+    font-size: 1em;
+    font-weight: 400;
+    opacity: 0.95;
+}
+
+/* ---- KSB Footer ---- */
+.footer {
+    background: linear-gradient(135deg, #003D7A 0%, #001F3F 100%);
+    color: #fff;
+    padding: var(--spacing-lg);
+    margin-top: var(--spacing-xl);
+    border-top: 3px solid var(--ksb-accent);
+}
+
+.footer-content {
+    max-width: 1600px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-lg);
+    text-align: center;
+}
+
+.footer-brand strong {
+    font-size: 1.2em;
+    display: block;
+    margin-bottom: var(--spacing-xs);
+    color: var(--ksb-accent);
+}
+
+.footer-brand p {
+    opacity: 0.9;
+    font-size: 0.9em;
+}
+
+.footer-info p {
+    margin: var(--spacing-xs) 0;
+    font-size: 0.9em;
+}
+
+.footer-contact a {
+    color: var(--ksb-accent);
+    text-decoration: none;
+    transition: var(--transition-fast);
+}
+
+.footer-contact a:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+.footer-contact p {
+    margin: var(--spacing-xs) 0;
+    font-size: 0.9em;
+}
+
+/* ---- Accessibility Helper (visually hidden but screen reader accessible) ---- */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ---- Focus Indicators for Accessibility ---- */
+a:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 3px solid var(--ksb-accent);
+    outline-offset: 2px;
+}
+
+/* ---- High Contrast Focus for Buttons ---- */
+.btn:focus {
+    box-shadow: 0 0 0 3px rgba(0, 160, 220, 0.5);
 }
