@@ -184,6 +184,59 @@
             transition: all 0.3s ease;
         }
 
+        .metadata-section {
+            background: white;
+            border: 2px solid var(--color-border);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .metadata-section h3 {
+            color: var(--color-primary);
+            margin-bottom: var(--spacing-md);
+            font-size: 1.3em;
+        }
+
+        .metadata-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-md);
+        }
+
+        .metadata-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .metadata-label {
+            font-size: 0.85em;
+            font-weight: 600;
+            color: var(--color-text);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metadata-input {
+            padding: 10px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius-sm);
+            font-size: 1em;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .metadata-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.2);
+        }
+
+        .metadata-input::placeholder {
+            color: #999;
+        }
+
         .upload-section:hover {
             border-color: var(--color-secondary);
             background: #f0f0f5;
@@ -1255,6 +1308,38 @@
                 </div>
             </div>
 
+            <!-- Project Metadata Section -->
+            <div class="metadata-section">
+                <h3>📋 Project Information</h3>
+                <div class="metadata-grid">
+                    <div class="metadata-item">
+                        <label for="ksbReferenceNumber" class="metadata-label">KSB Reference Number</label>
+                        <input type="text" id="ksbReferenceNumber" class="metadata-input" 
+                               placeholder="Enter KSB reference number">
+                    </div>
+                    <div class="metadata-item">
+                        <label for="preparedBy" class="metadata-label">Prepared By</label>
+                        <input type="text" id="preparedBy" class="metadata-input" 
+                               placeholder="Enter preparer name">
+                    </div>
+                    <div class="metadata-item">
+                        <label for="endUserName" class="metadata-label">End User Name</label>
+                        <input type="text" id="endUserName" class="metadata-input" 
+                               placeholder="Enter end user name">
+                    </div>
+                    <div class="metadata-item">
+                        <label for="endUserNumber" class="metadata-label">End User Number</label>
+                        <input type="text" id="endUserNumber" class="metadata-input" 
+                               placeholder="Enter end user number">
+                    </div>
+                    <div class="metadata-item">
+                        <label for="installationPointNumber" class="metadata-label">Installation Point Number</label>
+                        <input type="text" id="installationPointNumber" class="metadata-input" 
+                               placeholder="Enter installation point number">
+                    </div>
+                </div>
+            </div>
+
             <!-- Upload Section -->
             <div class="upload-section" id="uploadSection">
                 <div class="empty-state-icon">📁</div>
@@ -1677,6 +1762,13 @@
         let uploadedFilesData = [];
         let analyzedData = null;
         let interchangeableEnabled = false;
+        let projectMetadata = {
+            ksbReferenceNumber: '',
+            preparedBy: '',
+            endUserName: '',
+            endUserNumber: '',
+            installationPointNumber: ''
+        };
 
         // DOM elements
         const fileInput = document.getElementById('fileInput');
@@ -1773,6 +1865,16 @@
         searchInput.addEventListener('input', applyFilters);
         categoryFilter.addEventListener('change', applyFilters);
         commonalityFilter.addEventListener('change', applyFilters);
+
+        // Metadata input handling
+        Object.keys(projectMetadata).forEach(fieldId => {
+            const element = document.getElementById(fieldId);
+            if (element) {
+                element.addEventListener('input', (e) => {
+                    projectMetadata[fieldId] = e.target.value;
+                });
+            }
+        });
 
         // Export buttons
         document.getElementById('exportExcel').addEventListener('click', exportToExcel);
@@ -2692,6 +2794,13 @@
                 ['Standard:', 'DIN 24296 Section 7.7.2, Table 32'],
                 ['Method:', 'Official lookup table by fleet size'],
                 [''],
+                ['PROJECT INFORMATION'],
+                ['KSB Reference Number:', projectMetadata.ksbReferenceNumber || 'N/A'],
+                ['Prepared By:', projectMetadata.preparedBy || 'N/A'],
+                ['End User Name:', projectMetadata.endUserName || 'N/A'],
+                ['End User Number:', projectMetadata.endUserNumber || 'N/A'],
+                ['Installation Point Number:', projectMetadata.installationPointNumber || 'N/A'],
+                [''],
                 ['FLEET SUMMARY'],
                 ['Total Pumps:', analyzedData.totalPumps],
                 ['Total Unique Parts:', analyzedData.all.length],
@@ -2731,7 +2840,18 @@
                 return;
             }
 
-            let csv = 'Part No.,Material No.,Designation,Category,Qty/Pump,Standard Qty,DIN 24296 Qty,Savings,Found In,Calculation\n';
+            let csv = 'INTERCHANGEABLE PARTS LIST - DIN 24296 TABLE 32 COMPLIANT\n';
+            csv += 'Generated:,' + new Date().toLocaleString() + '\n';
+            csv += 'Standard:,DIN 24296 Section 7.7.2 Table 32\n';
+            csv += '\n';
+            csv += 'PROJECT INFORMATION\n';
+            csv += 'KSB Reference Number:,' + (projectMetadata.ksbReferenceNumber || 'N/A') + '\n';
+            csv += 'Prepared By:,' + (projectMetadata.preparedBy || 'N/A') + '\n';
+            csv += 'End User Name:,' + (projectMetadata.endUserName || 'N/A') + '\n';
+            csv += 'End User Number:,' + (projectMetadata.endUserNumber || 'N/A') + '\n';
+            csv += 'Installation Point Number:,' + (projectMetadata.installationPointNumber || 'N/A') + '\n';
+            csv += '\n';
+            csv += 'Part No.,Material No.,Designation,Category,Qty/Pump,Standard Qty,DIN 24296 Qty,Savings,Found In,Calculation\n';
             analyzedData.all.forEach(part => {
                 csv += `"${part.partNo}","${part.materialNumber}","${part.designation}","${part.category}",${part.quantityPerPump},${part.standardQty},${part.recommendedQty},${part.savings},"${part.sourceFiles.length} pumps","${part.calculation}"\n`;
             });
@@ -2758,6 +2878,13 @@
                 ['Generated:', new Date().toLocaleString()],
                 ['Standard:', 'DIN 24296 Section 7.7.2, Table 32'],
                 ['Fleet Size:', analyzedData.totalPumps + ' pumps'],
+                [''],
+                ['PROJECT INFORMATION'],
+                ['KSB Reference Number:', projectMetadata.ksbReferenceNumber || 'N/A'],
+                ['Prepared By:', projectMetadata.preparedBy || 'N/A'],
+                ['End User Name:', projectMetadata.endUserName || 'N/A'],
+                ['End User Number:', projectMetadata.endUserNumber || 'N/A'],
+                ['Installation Point Number:', projectMetadata.installationPointNumber || 'N/A'],
                 [''],
                 ['SUMMARY'],
                 ['Common Parts (Used in 2+ Pumps):', commonParts.length],
@@ -2807,7 +2934,14 @@
                 ['PUMP COMPARISON MATRIX - DIN 24296 TABLE 32 CROSS-REFERENCE'],
                 ['Generated:', new Date().toLocaleString()],
                 ['Total Pumps:', analyzedData.totalPumps],
-                ['Total Unique Parts:', allParts.length]
+                ['Total Unique Parts:', allParts.length],
+                [''],
+                ['PROJECT INFORMATION'],
+                ['KSB Reference Number:', projectMetadata.ksbReferenceNumber || 'N/A'],
+                ['Prepared By:', projectMetadata.preparedBy || 'N/A'],
+                ['End User Name:', projectMetadata.endUserName || 'N/A'],
+                ['End User Number:', projectMetadata.endUserNumber || 'N/A'],
+                ['Installation Point Number:', projectMetadata.installationPointNumber || 'N/A']
             ];
 
             const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
