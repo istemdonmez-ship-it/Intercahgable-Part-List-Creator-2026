@@ -2509,7 +2509,9 @@
             html += '<th>DIN 24296 Qty</th>';
             
             pumps.forEach(pump => {
-                html += `<th style="min-width: 80px; text-align: center;">${pump.label}</th>`;
+                const displayName = pump.model && pump.model !== 'N/A' ? pump.model : pump.label;
+                const serialInfo = pump.serial && pump.serial !== 'N/A' ? `<br><small>SN: ${pump.serial}</small>` : '';
+                html += `<th style="min-width: 80px; text-align: center;">${displayName}${serialInfo}</th>`;
             });
             
             html += '</tr></thead><tbody>';
@@ -2596,7 +2598,9 @@
             html += '<table class="parts-table"><thead><tr>';
             html += '<th>Material No.</th><th>Part No.</th><th>Designation</th><th>Category</th><th>Standard Qty</th><th>DIN 24296 Qty</th>';
             pumps.forEach(pump => {
-                html += `<th style="min-width: 100px;">${pump.label}${pump.quantity > 1 ? ` (×${pump.quantity})` : ''}</th>`;
+                const displayName = pump.model && pump.model !== 'N/A' ? pump.model : pump.label;
+                const serialInfo = pump.serial && pump.serial !== 'N/A' ? `<br><small>SN: ${pump.serial}</small>` : '';
+                html += `<th style="min-width: 100px;">${displayName}${serialInfo}${pump.quantity > 1 ? ` (×${pump.quantity})` : ''}</th>`;
             });
             html += '</tr></thead><tbody>';
 
@@ -2814,7 +2818,11 @@
             XLSX.utils.book_append_sheet(wb, summarySheet, 'Overview');
 
             const matrixHeaders = ['Material No.', 'Part No.', 'Designation', 'Category', 'Standard Qty', 'DIN 24296 Qty', 'Savings'];
-            pumps.forEach(pump => matrixHeaders.push(`${pump.label}`));
+            pumps.forEach(pump => {
+                const displayName = pump.model && pump.model !== 'N/A' ? pump.model : pump.label;
+                const serialInfo = pump.serial && pump.serial !== 'N/A' ? ` (SN: ${pump.serial})` : '';
+                matrixHeaders.push(displayName + serialInfo);
+            });
 
             const matrixData = [matrixHeaders];
             allParts.forEach(part => {

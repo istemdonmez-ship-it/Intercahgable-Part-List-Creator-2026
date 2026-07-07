@@ -299,7 +299,9 @@ function displayCommonSparesMatrix(data) {
     html += '<th style="min-width:250px">Designation</th>';
     html += '<th>DIN 24296 Qty</th>';
     pumps.forEach((pump) => {
-        html += `<th style="min-width:80px;text-align:center">${sanitizeString(pump.label)}</th>`;
+        const displayName = pump.model && pump.model !== 'N/A' ? pump.model : pump.label;
+        const serialInfo = pump.serial && pump.serial !== 'N/A' ? `<br><small>SN: ${sanitizeString(pump.serial)}</small>` : '';
+        html += `<th style="min-width:80px;text-align:center">${sanitizeString(displayName)}${serialInfo}</th>`;
     });
     html += '</tr></thead><tbody>';
 
@@ -383,7 +385,9 @@ function displayComparison(data) {
     html += '<table class="parts-table"><thead><tr>';
     html += '<th>Material No.</th><th>Part No.</th><th>Designation</th><th>Category</th><th>Standard Qty</th><th>DIN 24296 Qty</th>';
     pumps.forEach((pump) => {
-        html += `<th style="min-width:100px">${sanitizeString(pump.label)}${pump.quantity > 1 ? ` (×${pump.quantity})` : ''}</th>`;
+        const displayName = pump.model && pump.model !== 'N/A' ? pump.model : pump.label;
+        const serialInfo = pump.serial && pump.serial !== 'N/A' ? `<br><small>SN: ${sanitizeString(pump.serial)}</small>` : '';
+        html += `<th style="min-width:100px">${sanitizeString(displayName)}${serialInfo}${pump.quantity > 1 ? ` (×${pump.quantity})` : ''}</th>`;
     });
     html += '</tr></thead><tbody>';
 
