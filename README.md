@@ -1,5 +1,7 @@
 # Interchangeable Parts List Creator 2026
 
+**Powered by KSB Pump Solutions**
+
 A professional, browser-based tool for generating **DIN 24296 compliant** interchangeable spare parts lists for industrial pump fleets.
 
 ---
@@ -47,7 +49,7 @@ When multiple pumps share common parts, a single stock pool can serve the entire
 | Safari  | 14+ |
 | Edge    | 90+ |
 
-No installation or server is required. Open `Code.html` directly in any modern browser.
+No installation or server is required. Open `index.html` (or `Code.html` for single-file version) directly in any modern browser.
 
 ---
 
@@ -55,17 +57,22 @@ No installation or server is required. Open `Code.html` directly in any modern b
 
 ```
 /
-├── Code.html               — Main application page
+├── index.html              — Main application (modular version)
+├── Code.html               — Single-file distribution version
 ├── README.md               — This file
+├── CHANGELOG.md            — Version history and changes
 ├── LICENSE                 — MIT License
 ├── .gitignore
 │
 ├── css/
-│   ├── main.css            — CSS variables, base styles, layout
-│   ├── components.css      — Reusable UI components
+│   ├── main.css            — CSS variables, base styles, layout, KSB branding
+│   ├── components.css      — Reusable UI components, modal styles
 │   └── responsive.css      — Media queries (mobile, print)
 │
 ├── js/
+│   ├── config.js           — Configuration constants and settings
+│   ├── errorHandler.js     — Centralized error handling
+│   ├── keyboardShortcuts.js— Keyboard shortcuts handler
 │   ├── app.js              — Main application entry point
 │   ├── fileHandler.js      — File upload, validation, drag & drop, parsing
 │   ├── dinClassifier.js    — DIN 24296 classification & Table 32 lookup
@@ -87,7 +94,7 @@ No installation or server is required. Open `Code.html` directly in any modern b
 
 ## 🔧 Usage
 
-1. Open `Code.html` in your browser.
+1. Open `index.html` (or `Code.html` for single-file version) in your browser.
 2. Upload one or more CSV / Excel files (one file per pump or pump type).
 3. (Optional) Label each pump and enter its quantity, model, and location.
 4. Toggle **DIN 24296 Table 32 optimization** if you want interchangeable-parts analysis.
@@ -95,6 +102,20 @@ No installation or server is required. Open `Code.html` directly in any modern b
 6. Review results in the tabs and export in your preferred format.
 
 For detailed instructions, see [docs/USAGE.md](docs/USAGE.md).
+
+---
+
+## ⌨️ Keyboard Shortcuts
+
+Press `F1` or `?` to see all available shortcuts. Quick reference:
+
+- **Ctrl+E** - Export to Excel
+- **Ctrl+Shift+C** - Export to CSV
+- **Ctrl+Enter** - Analyze Parts
+- **Ctrl+F** - Focus Search
+- **Escape** - Close dialogs
+
+*Note: Use Cmd instead of Ctrl on Mac*
 
 ---
 
@@ -123,8 +144,10 @@ CSV files should use semicolons (`;`) as delimiter. Excel files (.xlsx / .xls) s
 
 - All user inputs are sanitized to prevent XSS attacks.
 - File type and size validation is performed before parsing.
-- A Content Security Policy (CSP) meta tag restricts script sources.
+- Centralized error handling with detailed logging.
+- A strengthened Content Security Policy (CSP) meta tag restricts script sources.
 - Third-party CDN scripts are loaded with `crossorigin="anonymous"`.
+- Input validation on all form fields.
 
 ---
 
@@ -136,6 +159,19 @@ CSV files should use semicolons (`;`) as delimiter. Excel files (.xlsx / .xls) s
 | [PapaParse](https://www.papaparse.com/) | 5.4.1 | CSV parsing |
 
 No build tools, bundlers, or package managers are required. All dependencies are bundled locally in `js/lib/`.
+
+---
+
+## ✨ What's New in Version 2.0
+
+- **KSB Branding** - Complete visual rebrand with KSB corporate identity
+- **Keyboard Shortcuts** - Boost productivity with keyboard commands
+- **Enhanced Error Handling** - Better error messages and debugging
+- **Improved Accessibility** - ARIA labels, semantic HTML, keyboard navigation
+- **Centralized Configuration** - All settings in one place
+- **Better Code Organization** - Modular structure with clear separation of concerns
+
+See [CHANGELOG.md](CHANGELOG.md) for complete version history.
 
 ---
 
@@ -159,4 +195,13 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 ## 📞 Support
 
+**KSB Pump Solutions**
+
 For questions about DIN 24296 compliance or spare parts optimization, refer to [docs/DIN_24296_GUIDE.md](docs/DIN_24296_GUIDE.md).
+
+For technical support: support@ksb.com  
+Website: www.ksb.com
+
+---
+
+**Version 2.0.0** | © 2026 KSB Pump | MIT License
