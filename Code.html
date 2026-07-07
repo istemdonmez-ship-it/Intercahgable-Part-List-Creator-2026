@@ -2324,13 +2324,11 @@
             html += '</div>';
             summaryDiv.innerHTML = html;
             
-            /* Attach event listener to the export button */
-            setTimeout(() => {
-                const exportBtn = document.getElementById('exportPumpInventory');
-                if (exportBtn) {
-                    exportBtn.addEventListener('click', () => exportPumpInventorySummary(analyzedData));
-                }
-            }, 0);
+            /* Attach event listener immediately after setting innerHTML */
+            const exportBtn = document.getElementById('exportPumpInventory');
+            if (exportBtn) {
+                exportBtn.onclick = exportPumpInventorySummary;
+            }
         }
 
         function displayDINComplianceInfo(data) {
@@ -2851,7 +2849,7 @@
             XLSX.writeFile(wb, filename);
         }
 
-        function exportPumpInventorySummary(analyzedData) {
+        function exportPumpInventorySummary() {
             if (!analyzedData || !analyzedData.pumpList || analyzedData.pumpList.length === 0) {
                 alert('No pump inventory data available to export!');
                 return;

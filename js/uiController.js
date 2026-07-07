@@ -138,17 +138,15 @@ function displayPumpSummary(pumpList, totalPumps) {
     html += '</div>';
     summaryDiv.innerHTML = html;
     
-    /* Attach event listener to the export button */
-    setTimeout(() => {
-        const exportBtn = document.getElementById('exportPumpInventory');
-        if (exportBtn) {
-            exportBtn.addEventListener('click', () => {
-                if (typeof exportPumpInventorySummary === 'function') {
-                    exportPumpInventorySummary(window.analyzedData);
-                }
-            });
-        }
-    }, 0);
+    /* Attach event listener using event delegation from parent that doesn't get re-rendered */
+    const exportBtn = document.getElementById('exportPumpInventory');
+    if (exportBtn) {
+        exportBtn.onclick = function() {
+            if (typeof exportPumpInventorySummary === 'function') {
+                exportPumpInventorySummary(window.analyzedData);
+            }
+        };
+    }
 }
 
 /* ---- DIN compliance info ---- */
