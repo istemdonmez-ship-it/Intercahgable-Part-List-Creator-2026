@@ -320,9 +320,12 @@ function exportPumpInventorySummary(analyzedData) {
         ];
 
         pumpList.forEach((pump, index) => {
+            const displayLabel = pump.model 
+                ? `${pump.label}: ${pump.model}`
+                : pump.label;
             summaryAoA.push([
                 index + 1,
-                pump.label,
+                displayLabel,
                 pump.quantity,
                 pump.model || 'N/A',
                 pump.serial || 'N/A',
