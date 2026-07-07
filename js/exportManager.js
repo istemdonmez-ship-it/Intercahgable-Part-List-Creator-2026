@@ -227,23 +227,31 @@ function exportComparisonMatrix(analyzedData) {
 
         /* Sheet 2 — Matrix */
         const matrixHeaders = [
-            'Material No.', 'Part No.', 'Designation', 'Category',
+            'Material No.', 'Part No.', 'Designation', 'Part Name', 'Category',
             'Standard Qty', 'DIN 24296 Qty', 'Savings',
             ...pumpList.map((p) => p.label),
+            ...pumpList.map((p) => `${p.label} Model`),
         ];
         const matrixRows = allParts.map((part) => {
             const pumpCols = pumpList.map((pump) =>
                 part.sourceFiles.includes(pump.label) ? '✓' : '-'
             );
+            const pumpModelCols = pumpList.map((pump) =>
+                part.sourceFiles.includes(pump.label) ? (pump.model || 'N/A') : '-'
+            );
+            // Extract part name from designation (first word before space or special chars)
+            const partName = extractPartName(part.designation);
             return [
                 part.materialNumber,
                 part.partNo,
                 part.designation,
+                partName,
                 part.category,
                 part.standardQty,
                 part.recommendedQty,
                 part.savings,
                 ...pumpCols,
+                ...pumpModelCols,
             ];
         });
         XLSX.utils.book_append_sheet(
@@ -289,4 +297,30 @@ function downloadTextFile(content, filename, mimeType) {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+}
+
+/**
+ * Extract the part name from a designation string.
+ * Returns the first word/token before any space, number, or special character.
+ * Example: "SHAFT 65X 588 C45+N WS55-Standard" → "SHAFT"
+ * 
+ * @param {string} designation - The full designation string
+ * @returns {string} The extracted part name
+ */
+function extractPartName(designation) {
+    if (!designation || typeof designation !== 'string') {
+        return '';
+    }
+    
+    // Trim and get the first word before space or special characters
+    const trimmed = designation.trim();
+    const match = trimmed.match(/^([A-Za-z]+)/);
+    
+    if (match && match[1]) {
+        return match[1].toUpperCase();
+    }
+    
+    // Fallback: just get the first token before space
+    const firstWord = trimmed.split(/[\s\d\-\+]+/)[0];
+    return firstWord ? firstWord.toUpperCase() : '';
 }
