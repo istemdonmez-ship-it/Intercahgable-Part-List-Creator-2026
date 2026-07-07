@@ -123,11 +123,11 @@ function displayPumpSummary(pumpList, totalPumps) {
     html += '<div class="pump-list">';
 
     pumpList.forEach((pump) => {
+        const displayLabel = formatPumpLabel(pump);
         html += `
             <div class="pump-list-item">
-                <strong>${sanitizeString(pump.label)}${pump.quantity > 1 ? ` (× ${pump.quantity})` : ''}</strong>
+                <strong>${displayLabel}${pump.quantity > 1 ? ` (× ${pump.quantity})` : ''}</strong>
                 <div class="pump-meta">
-                    ${pump.model    ? `<span>📋 Model: ${sanitizeString(pump.model)}</span>`      : ''}
                     ${pump.serial   ? `<span>🔢 S/N: ${sanitizeString(pump.serial)}</span>`       : ''}
                     ${pump.location ? `<span>📍 Location: ${sanitizeString(pump.location)}</span>`: ''}
                     <span>📄 File: ${sanitizeString(pump.file)}</span>

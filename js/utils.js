@@ -25,6 +25,17 @@ function sanitizeString(value) {
 }
 
 /**
+ * Format a pump label with model information.
+ * @param {object} pump - Pump object with label and model properties.
+ * @returns {string} Formatted pump label (e.g., "Pump 1: ETANORM G 150-315 SP").
+ */
+function formatPumpLabel(pump) {
+    return pump.model 
+        ? `${sanitizeString(pump.label)}: ${sanitizeString(pump.model)}`
+        : sanitizeString(pump.label);
+}
+
+/**
  * Remove leading/trailing quotes and whitespace from spreadsheet cell values.
  * @param {*} value - Raw cell value.
  * @returns {string} Cleaned string.

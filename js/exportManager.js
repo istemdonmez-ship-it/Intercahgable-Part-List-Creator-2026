@@ -316,18 +316,18 @@ function exportPumpInventorySummary(analyzedData) {
             ['Fleet Size Category:', fleetCategory],
             [''],
             ['PUMP DETAILS'],
-            ['#', 'Pump Label', 'Quantity', 'Model', 'Serial Number', 'Location', 'Source File'],
+            ['#', 'Pump Label', 'Quantity', 'Serial Number', 'Location', 'Source File'],
         ];
 
         pumpList.forEach((pump, index) => {
+            const displayLabel = formatPumpLabel(pump);
             summaryAoA.push([
                 index + 1,
-                pump.label,
-                pump.quantity,
-                pump.model || 'N/A',
-                pump.serial || 'N/A',
-                pump.location || 'N/A',
-                pump.file,
+                displayLabel,
+                sanitizeString(pump.quantity),
+                sanitizeString(pump.serial) || 'N/A',
+                sanitizeString(pump.location) || 'N/A',
+                sanitizeString(pump.file),
             ]);
         });
 
