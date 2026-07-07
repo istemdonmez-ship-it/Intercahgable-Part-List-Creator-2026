@@ -1843,18 +1843,22 @@
         }
 
         // File upload handling
-        fileInput.addEventListener('change', handleFileSelect);
-        uploadSection.addEventListener('dragover', handleDragOver);
-        uploadSection.addEventListener('dragleave', handleDragLeave);
-        uploadSection.addEventListener('drop', handleDrop);
-        analyzeButton.addEventListener('click', analyzeParts);
-        clearButton.addEventListener('click', clearAll);
+        if (fileInput) fileInput.addEventListener('change', handleFileSelect);
+        if (uploadSection) {
+            uploadSection.addEventListener('dragover', handleDragOver);
+            uploadSection.addEventListener('dragleave', handleDragLeave);
+            uploadSection.addEventListener('drop', handleDrop);
+        }
+        if (analyzeButton) analyzeButton.addEventListener('click', analyzeParts);
+        if (clearButton) clearButton.addEventListener('click', clearAll);
 
         // Interchangeable toggle
-        interchangeableToggle.addEventListener('click', () => {
-            interchangeableEnabled = !interchangeableEnabled;
-            interchangeableToggle.classList.toggle('active');
-        });
+        if (interchangeableToggle) {
+            interchangeableToggle.addEventListener('click', () => {
+                interchangeableEnabled = !interchangeableEnabled;
+                interchangeableToggle.classList.toggle('active');
+            });
+        }
 
         // Tab switching
         document.querySelectorAll('.tab').forEach(tab => {
@@ -1862,9 +1866,9 @@
         });
 
         // Search and filter
-        searchInput.addEventListener('input', applyFilters);
-        categoryFilter.addEventListener('change', applyFilters);
-        commonalityFilter.addEventListener('change', applyFilters);
+        if (searchInput) searchInput.addEventListener('input', applyFilters);
+        if (categoryFilter) categoryFilter.addEventListener('change', applyFilters);
+        if (commonalityFilter) commonalityFilter.addEventListener('change', applyFilters);
 
         // Metadata input handling
         Object.keys(projectMetadata).forEach(fieldId => {
@@ -1877,11 +1881,17 @@
         });
 
         // Export buttons
-        document.getElementById('exportExcel').addEventListener('click', exportToExcel);
-        document.getElementById('exportCSV').addEventListener('click', exportToCSV);
-        document.getElementById('exportCommonReport').addEventListener('click', exportCommonSparesReport);
-        document.getElementById('exportComparisonReport').addEventListener('click', exportComparisonMatrix);
-        document.getElementById('exportPDF').addEventListener('click', printReport);
+        const exportExcel = document.getElementById('exportExcel');
+        const exportCSV = document.getElementById('exportCSV');
+        const exportCommonReport = document.getElementById('exportCommonReport');
+        const exportComparisonReport = document.getElementById('exportComparisonReport');
+        const exportPDF = document.getElementById('exportPDF');
+        
+        if (exportExcel) exportExcel.addEventListener('click', exportToExcel);
+        if (exportCSV) exportCSV.addEventListener('click', exportToCSV);
+        if (exportCommonReport) exportCommonReport.addEventListener('click', exportCommonSparesReport);
+        if (exportComparisonReport) exportComparisonReport.addEventListener('click', exportComparisonMatrix);
+        if (exportPDF) exportPDF.addEventListener('click', printReport);
 
         function handleFileSelect(e) {
             const files = Array.from(e.target.files);
