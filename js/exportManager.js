@@ -321,15 +321,15 @@ function exportPumpInventorySummary(analyzedData) {
 
         pumpList.forEach((pump, index) => {
             const displayLabel = pump.model 
-                ? `${pump.label}: ${pump.model}`
-                : pump.label;
+                ? `${sanitizeString(pump.label)}: ${sanitizeString(pump.model)}`
+                : sanitizeString(pump.label);
             summaryAoA.push([
                 index + 1,
                 displayLabel,
                 pump.quantity,
-                pump.serial || 'N/A',
-                pump.location || 'N/A',
-                pump.file,
+                sanitizeString(pump.serial) || 'N/A',
+                sanitizeString(pump.location) || 'N/A',
+                sanitizeString(pump.file),
             ]);
         });
 
