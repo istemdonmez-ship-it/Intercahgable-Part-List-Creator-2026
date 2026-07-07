@@ -138,7 +138,7 @@ function displayPumpSummary(pumpList, totalPumps) {
     html += '</div>';
     summaryDiv.innerHTML = html;
     
-    /* Attach event listener using event delegation from parent that doesn't get re-rendered */
+    /* Attach event listener directly after DOM update */
     const exportBtn = document.getElementById('exportPumpInventory');
     if (exportBtn) {
         exportBtn.onclick = function() {
