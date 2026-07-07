@@ -1850,12 +1850,6 @@
         if (analyzeButton) analyzeButton.addEventListener('click', analyzeParts);
         if (clearButton) clearButton.addEventListener('click', clearAll);
 
-        // Interchangeable toggle handler
-        function handleInterchangeableToggle() {
-            interchangeableEnabled = !interchangeableEnabled;
-            interchangeableToggle.classList.toggle('active');
-        }
-
         // Interchangeable toggle
         if (interchangeableToggle) interchangeableToggle.addEventListener('click', handleInterchangeableToggle);
 
@@ -1899,19 +1893,26 @@
 
         function handleDragOver(e) {
             e.preventDefault();
-            uploadSection.classList.add('dragover');
+            if (uploadSection) uploadSection.classList.add('dragover');
         }
 
         function handleDragLeave(e) {
             e.preventDefault();
-            uploadSection.classList.remove('dragover');
+            if (uploadSection) uploadSection.classList.remove('dragover');
         }
 
         function handleDrop(e) {
             e.preventDefault();
-            uploadSection.classList.remove('dragover');
+            if (uploadSection) uploadSection.classList.remove('dragover');
             const files = Array.from(e.dataTransfer.files);
             processFiles(files);
+        }
+
+        function handleInterchangeableToggle() {
+            if (interchangeableToggle) {
+                interchangeableEnabled = !interchangeableEnabled;
+                interchangeableToggle.classList.toggle('active');
+            }
         }
 
         function processFiles(files) {
