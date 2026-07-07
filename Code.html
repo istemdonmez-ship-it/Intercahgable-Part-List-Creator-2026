@@ -1314,23 +1314,38 @@
                 <div class="metadata-grid">
                     <div class="metadata-item">
                         <label for="ksbReferenceNumber" class="metadata-label">KSB Reference Number</label>
-                        <input type="text" id="ksbReferenceNumber" class="metadata-input" placeholder="Enter KSB reference number">
+                        <input type="text" id="ksbReferenceNumber" class="metadata-input" 
+                               placeholder="Enter KSB reference number"
+                               aria-label="KSB Reference Number"
+                               aria-describedby="ksbReferenceNumber-label">
                     </div>
                     <div class="metadata-item">
                         <label for="preparedBy" class="metadata-label">Prepared By</label>
-                        <input type="text" id="preparedBy" class="metadata-input" placeholder="Enter preparer name">
+                        <input type="text" id="preparedBy" class="metadata-input" 
+                               placeholder="Enter preparer name"
+                               aria-label="Prepared By"
+                               aria-describedby="preparedBy-label">
                     </div>
                     <div class="metadata-item">
                         <label for="endUserName" class="metadata-label">End User Name</label>
-                        <input type="text" id="endUserName" class="metadata-input" placeholder="Enter end user name">
+                        <input type="text" id="endUserName" class="metadata-input" 
+                               placeholder="Enter end user name"
+                               aria-label="End User Name"
+                               aria-describedby="endUserName-label">
                     </div>
                     <div class="metadata-item">
                         <label for="endUserNumber" class="metadata-label">End User Number</label>
-                        <input type="text" id="endUserNumber" class="metadata-input" placeholder="Enter end user number">
+                        <input type="text" id="endUserNumber" class="metadata-input" 
+                               placeholder="Enter end user number"
+                               aria-label="End User Number"
+                               aria-describedby="endUserNumber-label">
                     </div>
                     <div class="metadata-item">
                         <label for="installationPointNumber" class="metadata-label">Installation Point Number</label>
-                        <input type="text" id="installationPointNumber" class="metadata-input" placeholder="Enter installation point number">
+                        <input type="text" id="installationPointNumber" class="metadata-input" 
+                               placeholder="Enter installation point number"
+                               aria-label="Installation Point Number"
+                               aria-describedby="installationPointNumber-label">
                     </div>
                 </div>
             </div>
@@ -1862,20 +1877,11 @@
         commonalityFilter.addEventListener('change', applyFilters);
 
         // Metadata input handling
-        document.getElementById('ksbReferenceNumber').addEventListener('input', (e) => {
-            projectMetadata.ksbReferenceNumber = e.target.value;
-        });
-        document.getElementById('preparedBy').addEventListener('input', (e) => {
-            projectMetadata.preparedBy = e.target.value;
-        });
-        document.getElementById('endUserName').addEventListener('input', (e) => {
-            projectMetadata.endUserName = e.target.value;
-        });
-        document.getElementById('endUserNumber').addEventListener('input', (e) => {
-            projectMetadata.endUserNumber = e.target.value;
-        });
-        document.getElementById('installationPointNumber').addEventListener('input', (e) => {
-            projectMetadata.installationPointNumber = e.target.value;
+        const metadataFields = ['ksbReferenceNumber', 'preparedBy', 'endUserName', 'endUserNumber', 'installationPointNumber'];
+        metadataFields.forEach(fieldId => {
+            document.getElementById(fieldId).addEventListener('input', (e) => {
+                projectMetadata[fieldId] = e.target.value;
+            });
         });
 
         // Export buttons
