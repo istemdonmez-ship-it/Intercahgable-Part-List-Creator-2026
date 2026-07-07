@@ -15,6 +15,9 @@ let uploadedFilesData  = []; // Array of fileData descriptors
 let analyzedData       = null; // Result from processAndCategorizeParts()
 let interchangeableEnabled = false;
 
+/* Make analyzedData accessible globally for export functions */
+window.analyzedData = analyzedData;
+
 /* ============================================================
    DOM references (cached on DOMContentLoaded)
    ============================================================ */
@@ -159,6 +162,9 @@ async function handleAnalyze() {
             location: f.location,
         }));
 
+        /* Update global reference for export functions */
+        window.analyzedData = analyzedData;
+
         displayResults(analyzedData, interchangeableEnabled);
 
         loading.classList.remove('active');
@@ -185,6 +191,7 @@ function handleClear() {
     document.getElementById('interchangeableSection').style.display  = 'none';
     resultsSection.style.display = 'none';
     analyzedData               = null;
+    window.analyzedData        = null;
     interchangeableEnabled     = false;
     interchangeableToggle.classList.remove('active');
     updateButtons(0);

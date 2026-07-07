@@ -115,7 +115,10 @@ function displayResults(data, din24296Enabled) {
 /* ---- Pump summary ---- */
 function displayPumpSummary(pumpList, totalPumps) {
     const summaryDiv = document.getElementById('pumpSummary');
-    let html = '<h4>🏭 Pump Inventory Summary</h4>';
+    let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">';
+    html += '<h4 style="margin:0">🏭 Pump Inventory Summary</h4>';
+    html += '<button class="btn-export btn-excel" id="exportPumpInventory" style="font-size:0.9em;padding:6px 12px">📊 Export to Excel</button>';
+    html += '</div>';
     html += `<p style="margin-bottom:15px"><strong>Total Pumps: ${totalPumps}</strong> (Fleet size for DIN 24296 Table 32)</p>`;
     html += '<div class="pump-list">';
 
@@ -134,6 +137,19 @@ function displayPumpSummary(pumpList, totalPumps) {
 
     html += '</div>';
     summaryDiv.innerHTML = html;
+    
+    /* Attach event listener to the export button */
+    setTimeout(() => {
+        const exportBtn = document.getElementById('exportPumpInventory');
+        if (exportBtn) {
+            exportBtn.addEventListener('click', () => {
+                const data = window.analyzedData || analyzedData;
+                if (typeof exportPumpInventorySummary === 'function') {
+                    exportPumpInventorySummary(data);
+                }
+            });
+        }
+    }, 0);
 }
 
 /* ---- DIN compliance info ---- */

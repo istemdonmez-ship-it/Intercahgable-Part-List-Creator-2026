@@ -262,6 +262,58 @@ function exportComparisonMatrix(analyzedData) {
 }
 
 /**
+ * Export the pump inventory summary to an Excel workbook.
+ *
+ * Sheets:
+ *   1. Pump Inventory Summary — details of all pumps in the fleet
+ *
+ * @param {object} analyzedData
+ */
+function exportPumpInventorySummary(analyzedData) {
+    if (!analyzedData || !analyzedData.pumpList || analyzedData.pumpList.length === 0) {
+        showNotification('No pump inventory data available to export.', 'error');
+        return;
+    }
+
+    try {
+        const wb = XLSX.utils.book_new();
+        const { pumpList, totalPumps } = analyzedData;
+
+        /* Sheet 1 — Pump Inventory Summary */
+        const summaryAoA = [
+            ['PUMP INVENTORY SUMMARY — DIN 24296 TABLE 32 COMPLIANT'],
+            ['Generated:', new Date().toLocaleString()],
+            ['Total Pumps:', totalPumps],
+            ['Fleet Size Category:', `Fleet size for DIN 24296 Table 32`],
+            [''],
+            ['PUMP DETAILS'],
+            ['#', 'Pump Label', 'Quantity', 'Model', 'Serial Number', 'Location', 'Source File'],
+        ];
+
+        pumpList.forEach((pump, index) => {
+            summaryAoA.push([
+                index + 1,
+                pump.label,
+                pump.quantity,
+                pump.model || 'N/A',
+                pump.serial || 'N/A',
+                pump.location || 'N/A',
+                pump.file,
+            ]);
+        });
+
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summaryAoA), 'Pump Inventory');
+
+        const filename = `Pump_Inventory_Summary_${totalPumps}pumps_${formatDateISO()}.xlsx`;
+        XLSX.writeFile(wb, filename);
+        showNotification(`✅ Pump inventory summary exported to ${filename}`, 'success');
+    } catch (err) {
+        console.error('Pump inventory export error:', err);
+        showNotification('❌ Failed to export pump inventory summary.', 'error');
+    }
+}
+
+/**
  * Trigger the browser's native print dialog for a PDF-friendly print view.
  */
 function printReport() {
