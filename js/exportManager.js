@@ -325,8 +325,15 @@ function extractPartName(designation) {
     }
     
     // Fallback: handles edge cases where designation starts with numbers/special chars
-    // Splits on common delimiters and returns first non-empty token
+    // Splits on common delimiters and returns first non-empty alphabetic token
     // Example: "123-PART" would return "PART"
-    const firstWord = trimmed.split(/[\s\d\-\+]+/)[0];
-    return firstWord ? firstWord.toUpperCase() : '';
+    const tokens = trimmed.split(/[\s\d\-\+\.\/]+/).filter(t => t.length > 0);
+    for (const token of tokens) {
+        const alphabetic = token.match(/^([A-Za-z]+)/);
+        if (alphabetic && alphabetic[1]) {
+            return alphabetic[1].toUpperCase();
+        }
+    }
+    
+    return '';
 }
