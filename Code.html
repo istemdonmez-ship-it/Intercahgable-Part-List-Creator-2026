@@ -1315,32 +1315,27 @@
                     <div class="metadata-item">
                         <label for="ksbReferenceNumber" class="metadata-label">KSB Reference Number</label>
                         <input type="text" id="ksbReferenceNumber" class="metadata-input" 
-                               placeholder="Enter KSB reference number"
-                               aria-label="KSB Reference Number">
+                               placeholder="Enter KSB reference number">
                     </div>
                     <div class="metadata-item">
                         <label for="preparedBy" class="metadata-label">Prepared By</label>
                         <input type="text" id="preparedBy" class="metadata-input" 
-                               placeholder="Enter preparer name"
-                               aria-label="Prepared By">
+                               placeholder="Enter preparer name">
                     </div>
                     <div class="metadata-item">
                         <label for="endUserName" class="metadata-label">End User Name</label>
                         <input type="text" id="endUserName" class="metadata-input" 
-                               placeholder="Enter end user name"
-                               aria-label="End User Name">
+                               placeholder="Enter end user name">
                     </div>
                     <div class="metadata-item">
                         <label for="endUserNumber" class="metadata-label">End User Number</label>
                         <input type="text" id="endUserNumber" class="metadata-input" 
-                               placeholder="Enter end user number"
-                               aria-label="End User Number">
+                               placeholder="Enter end user number">
                     </div>
                     <div class="metadata-item">
                         <label for="installationPointNumber" class="metadata-label">Installation Point Number</label>
                         <input type="text" id="installationPointNumber" class="metadata-input" 
-                               placeholder="Enter installation point number"
-                               aria-label="Installation Point Number">
+                               placeholder="Enter installation point number">
                     </div>
                 </div>
             </div>
@@ -1872,8 +1867,7 @@
         commonalityFilter.addEventListener('change', applyFilters);
 
         // Metadata input handling
-        const metadataFields = ['ksbReferenceNumber', 'preparedBy', 'endUserName', 'endUserNumber', 'installationPointNumber'];
-        metadataFields.forEach(fieldId => {
+        Object.keys(projectMetadata).forEach(fieldId => {
             document.getElementById(fieldId).addEventListener('input', (e) => {
                 projectMetadata[fieldId] = e.target.value;
             });
