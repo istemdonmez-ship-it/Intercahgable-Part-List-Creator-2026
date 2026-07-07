@@ -324,7 +324,7 @@ function exportPumpInventorySummary(analyzedData) {
             summaryAoA.push([
                 index + 1,
                 displayLabel,
-                pump.quantity,
+                sanitizeString(pump.quantity),
                 sanitizeString(pump.serial) || 'N/A',
                 sanitizeString(pump.location) || 'N/A',
                 sanitizeString(pump.file),
