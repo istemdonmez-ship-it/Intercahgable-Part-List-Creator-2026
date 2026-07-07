@@ -1844,21 +1844,20 @@
 
         // File upload handling
         if (fileInput) fileInput.addEventListener('change', handleFileSelect);
-        if (uploadSection) {
-            uploadSection.addEventListener('dragover', handleDragOver);
-            uploadSection.addEventListener('dragleave', handleDragLeave);
-            uploadSection.addEventListener('drop', handleDrop);
-        }
+        if (uploadSection) uploadSection.addEventListener('dragover', handleDragOver);
+        if (uploadSection) uploadSection.addEventListener('dragleave', handleDragLeave);
+        if (uploadSection) uploadSection.addEventListener('drop', handleDrop);
         if (analyzeButton) analyzeButton.addEventListener('click', analyzeParts);
         if (clearButton) clearButton.addEventListener('click', clearAll);
 
-        // Interchangeable toggle
-        if (interchangeableToggle) {
-            interchangeableToggle.addEventListener('click', () => {
-                interchangeableEnabled = !interchangeableEnabled;
-                interchangeableToggle.classList.toggle('active');
-            });
+        // Interchangeable toggle handler
+        function handleInterchangeableToggle() {
+            interchangeableEnabled = !interchangeableEnabled;
+            interchangeableToggle.classList.toggle('active');
         }
+
+        // Interchangeable toggle
+        if (interchangeableToggle) interchangeableToggle.addEventListener('click', handleInterchangeableToggle);
 
         // Tab switching
         document.querySelectorAll('.tab').forEach(tab => {
