@@ -15,7 +15,7 @@
  * @returns {Array[]} AoA rows for the summary sheet.
  */
 function buildSummaryAoA(analyzedData) {
-    return [
+    const summaryRows = [
         ['INTERCHANGEABLE PARTS LIST — DIN 24296 TABLE 32 COMPLIANT'],
         ['Generated:', new Date().toLocaleString()],
         ['Standard:', 'DIN 24296 Section 7.7.2, Table 32'],
@@ -27,6 +27,20 @@ function buildSummaryAoA(analyzedData) {
         ['Common Parts:', analyzedData.common.length],
         ['DIN 24296 Optimization:', analyzedData.din24296Enabled ? 'Enabled' : 'Disabled'],
     ];
+
+    /* Add project information if available */
+    if (analyzedData.pumpList && analyzedData.pumpList.length > 0) {
+        const firstPump = analyzedData.pumpList[0];
+        summaryRows.push(['']);
+        summaryRows.push(['PROJECT INFORMATION']);
+        if (firstPump.ksbReferenceNumber) summaryRows.push(['KSB Reference Number:', firstPump.ksbReferenceNumber]);
+        if (firstPump.preparedBy) summaryRows.push(['Prepared By:', firstPump.preparedBy]);
+        if (firstPump.endUserName) summaryRows.push(['End User Name:', firstPump.endUserName]);
+        if (firstPump.endUserNumber) summaryRows.push(['End User Number:', firstPump.endUserNumber]);
+        if (firstPump.installationPointNumber) summaryRows.push(['Installation Point Number:', firstPump.installationPointNumber]);
+    }
+
+    return summaryRows;
 }
 
 /**

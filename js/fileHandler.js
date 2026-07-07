@@ -49,6 +49,11 @@ function processFiles(files, uploadedFilesData, onFilesChanged) {
             pumpModel: '',
             serialNo: '',
             location: '',
+            ksbReferenceNumber: '',
+            preparedBy: '',
+            endUserName: '',
+            endUserNumber: '',
+            installationPointNumber: '',
         };
 
         uploadedFilesData.push(fileData);
@@ -126,6 +131,46 @@ function renderFileItem(fileData, uploadedFilesData) {
                        placeholder="e.g., Building A"
                        data-field="location" data-file-id="${fileData.id}"
                        aria-label="Location for ${sanitizeString(fileData.name)}">
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">KSB Reference Number</span>
+                <input type="text" class="pump-input-small" maxlength="200"
+                       value="${sanitizeString(fileData.ksbReferenceNumber)}"
+                       placeholder="e.g., KSB-12345"
+                       data-field="ksbReferenceNumber" data-file-id="${fileData.id}"
+                       aria-label="KSB Reference Number for ${sanitizeString(fileData.name)}">
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Prepared By</span>
+                <input type="text" class="pump-input-small" maxlength="200"
+                       value="${sanitizeString(fileData.preparedBy)}"
+                       placeholder="e.g., John Doe"
+                       data-field="preparedBy" data-file-id="${fileData.id}"
+                       aria-label="Prepared By for ${sanitizeString(fileData.name)}">
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">End User Name</span>
+                <input type="text" class="pump-input-small" maxlength="200"
+                       value="${sanitizeString(fileData.endUserName)}"
+                       placeholder="e.g., ABC Corporation"
+                       data-field="endUserName" data-file-id="${fileData.id}"
+                       aria-label="End User Name for ${sanitizeString(fileData.name)}">
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">End User Number</span>
+                <input type="text" class="pump-input-small" maxlength="200"
+                       value="${sanitizeString(fileData.endUserNumber)}"
+                       placeholder="e.g., EU-12345"
+                       data-field="endUserNumber" data-file-id="${fileData.id}"
+                       aria-label="End User Number for ${sanitizeString(fileData.name)}">
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Installation Point Number</span>
+                <input type="text" class="pump-input-small" maxlength="200"
+                       value="${sanitizeString(fileData.installationPointNumber)}"
+                       placeholder="e.g., IP-001"
+                       data-field="installationPointNumber" data-file-id="${fileData.id}"
+                       aria-label="Installation Point Number for ${sanitizeString(fileData.name)}">
             </div>
         </div>
     `;

@@ -1815,7 +1815,12 @@
                         pumpQuantity: 1,
                         pumpModel: '',
                         serialNo: '',
-                        location: ''
+                        location: '',
+                        ksbReferenceNumber: '',
+                        preparedBy: '',
+                        endUserName: '',
+                        endUserNumber: '',
+                        installationPointNumber: ''
                     };
                     uploadedFilesData.push(fileData);
                     addFileToUI(fileData);
@@ -1873,6 +1878,36 @@
                         <input type="text" class="pump-input-small" value="${fileData.location}" 
                                placeholder="e.g., Building A"
                                onchange="updatePumpData(${fileData.id}, 'location', this.value)">
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">KSB Reference Number</span>
+                        <input type="text" class="pump-input-small" value="${fileData.ksbReferenceNumber}" 
+                               placeholder="e.g., KSB-12345"
+                               onchange="updatePumpData(${fileData.id}, 'ksbReferenceNumber', this.value)">
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Prepared By</span>
+                        <input type="text" class="pump-input-small" value="${fileData.preparedBy}" 
+                               placeholder="e.g., John Doe"
+                               onchange="updatePumpData(${fileData.id}, 'preparedBy', this.value)">
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">End User Name</span>
+                        <input type="text" class="pump-input-small" value="${fileData.endUserName}" 
+                               placeholder="e.g., ABC Corporation"
+                               onchange="updatePumpData(${fileData.id}, 'endUserName', this.value)">
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">End User Number</span>
+                        <input type="text" class="pump-input-small" value="${fileData.endUserNumber}" 
+                               placeholder="e.g., EU-12345"
+                               onchange="updatePumpData(${fileData.id}, 'endUserNumber', this.value)">
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Installation Point Number</span>
+                        <input type="text" class="pump-input-small" value="${fileData.installationPointNumber}" 
+                               placeholder="e.g., IP-001"
+                               onchange="updatePumpData(${fileData.id}, 'installationPointNumber', this.value)">
                     </div>
                 </div>
             `;
