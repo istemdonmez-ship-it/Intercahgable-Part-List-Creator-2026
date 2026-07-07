@@ -304,8 +304,11 @@ function downloadTextFile(content, filename, mimeType) {
  * Returns the first word/token before any space, number, or special character.
  * Example: "SHAFT 65X 588 C45+N WS55-Standard" → "SHAFT"
  * 
+ * Note: Only matches ASCII letters (A-Z, a-z). Non-ASCII characters in part names
+ * are not supported in the current implementation.
+ * 
  * @param {string} designation - The full designation string
- * @returns {string} The extracted part name
+ * @returns {string} The extracted part name (uppercase), or empty string if extraction fails
  */
 function extractPartName(designation) {
     if (!designation || typeof designation !== 'string') {
@@ -314,13 +317,16 @@ function extractPartName(designation) {
     
     // Trim and get the first word before space or special characters
     const trimmed = designation.trim();
+    // Primary extraction: match alphabetic characters at the start
     const match = trimmed.match(/^([A-Za-z]+)/);
     
     if (match && match[1]) {
         return match[1].toUpperCase();
     }
     
-    // Fallback: just get the first token before space
+    // Fallback: handles edge cases where designation starts with numbers/special chars
+    // Splits on common delimiters and returns first non-empty token
+    // Example: "123-PART" would return "PART"
     const firstWord = trimmed.split(/[\s\d\-\+]+/)[0];
     return firstWord ? firstWord.toUpperCase() : '';
 }
