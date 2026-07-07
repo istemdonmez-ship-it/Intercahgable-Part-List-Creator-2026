@@ -240,6 +240,21 @@ function exportComparisonMatrix(analyzedData) {
             'Standard Qty', 'DIN 24296 Qty', 'Savings',
             ...pumpList.map((p) => p.label),
         ];
+        
+        /* Add serial number row under pump headers */
+        const serialNumberRow = [
+            '', '', '', '',
+            '', '', '',
+            ...pumpList.map((p) => sanitizeString(p.serial) || 'N/A'),
+        ];
+        
+        /* Add model row under pump headers */
+        const modelRow = [
+            '', '', '', '',
+            '', '', '',
+            ...pumpList.map((p) => sanitizeString(p.model) || 'N/A'),
+        ];
+        
         const matrixRows = allParts.map((part) => {
             const pumpCols = pumpList.map((pump) =>
                 part.sourceFiles.includes(pump.label) ? '✓' : '-'
@@ -257,7 +272,7 @@ function exportComparisonMatrix(analyzedData) {
         });
         XLSX.utils.book_append_sheet(
             wb,
-            XLSX.utils.aoa_to_sheet([matrixHeaders, ...matrixRows]),
+            XLSX.utils.aoa_to_sheet([matrixHeaders, serialNumberRow, modelRow, ...matrixRows]),
             'Full Comparison Matrix'
         );
 
