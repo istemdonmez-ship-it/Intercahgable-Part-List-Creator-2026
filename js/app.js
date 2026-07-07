@@ -15,9 +15,6 @@ let uploadedFilesData  = []; // Array of fileData descriptors
 let analyzedData       = null; // Result from processAndCategorizeParts()
 let interchangeableEnabled = false;
 
-/* Make analyzedData accessible globally for export functions */
-window.analyzedData = analyzedData;
-
 /* ============================================================
    DOM references (cached on DOMContentLoaded)
    ============================================================ */

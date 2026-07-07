@@ -143,9 +143,8 @@ function displayPumpSummary(pumpList, totalPumps) {
         const exportBtn = document.getElementById('exportPumpInventory');
         if (exportBtn) {
             exportBtn.addEventListener('click', () => {
-                const data = window.analyzedData || analyzedData;
                 if (typeof exportPumpInventorySummary === 'function') {
-                    exportPumpInventorySummary(data);
+                    exportPumpInventorySummary(window.analyzedData);
                 }
             });
         }
