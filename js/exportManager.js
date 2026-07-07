@@ -227,23 +227,31 @@ function exportComparisonMatrix(analyzedData) {
 
         /* Sheet 2 — Matrix */
         const matrixHeaders = [
-            'Material No.', 'Part No.', 'Designation', 'Category',
+            'Material No.', 'Part No.', 'Designation', 'Part Name', 'Category',
             'Standard Qty', 'DIN 24296 Qty', 'Savings',
             ...pumpList.map((p) => p.label),
+            ...pumpList.map((p) => `${p.label} Model`),
         ];
         const matrixRows = allParts.map((part) => {
             const pumpCols = pumpList.map((pump) =>
                 part.sourceFiles.includes(pump.label) ? '✓' : '-'
             );
+            const pumpModelCols = pumpList.map((pump) =>
+                part.sourceFiles.includes(pump.label) ? (pump.model || 'N/A') : '-'
+            );
+            // Extract part name from designation (first word before space or special chars)
+            const partName = extractPartName(part.designation);
             return [
                 part.materialNumber,
                 part.partNo,
                 part.designation,
+                partName,
                 part.category,
                 part.standardQty,
                 part.recommendedQty,
                 part.savings,
                 ...pumpCols,
+                ...pumpModelCols,
             ];
         });
         XLSX.utils.book_append_sheet(
@@ -289,4 +297,43 @@ function downloadTextFile(content, filename, mimeType) {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+}
+
+/**
+ * Extract the part name from a designation string.
+ * Returns the first word/token before any space, number, or special character.
+ * Example: "SHAFT 65X 588 C45+N WS55-Standard" → "SHAFT"
+ * 
+ * Note: Only matches ASCII letters (A-Z, a-z). Non-ASCII characters in part names
+ * are not supported in the current implementation.
+ * 
+ * @param {string} designation - The full designation string
+ * @returns {string} The extracted part name (uppercase), or empty string if extraction fails
+ */
+function extractPartName(designation) {
+    if (!designation || typeof designation !== 'string') {
+        return '';
+    }
+    
+    // Trim and get the first word before space or special characters
+    const trimmed = designation.trim();
+    // Primary extraction: match alphabetic characters at the start
+    const match = trimmed.match(/^([A-Za-z]+)/);
+    
+    if (match && match[1]) {
+        return match[1].toUpperCase();
+    }
+    
+    // Fallback: handles edge cases where designation starts with numbers/special chars
+    // Splits on common delimiters and returns first non-empty alphabetic token
+    // Example: "123-PART" would return "PART"
+    const tokens = trimmed.split(/[\s\d\-\+\.\/]+/).filter(t => t.length > 0);
+    for (const token of tokens) {
+        const alphabetic = token.match(/^([A-Za-z]+)/);
+        if (alphabetic && alphabetic[1]) {
+            return alphabetic[1].toUpperCase();
+        }
+    }
+    
+    return '';
 }
