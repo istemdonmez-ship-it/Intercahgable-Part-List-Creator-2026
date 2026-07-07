@@ -175,6 +175,19 @@ function exportCommonSparesReport(analyzedData) {
             ['Total DIN 24296 Quantity:', commonParts.reduce((s, p) => s + p.recommendedQty, 0)],
             ['Total Savings:', commonParts.reduce((s, p) => s + p.savings, 0)],
         ];
+
+        /* Add project information if available */
+        if (analyzedData.pumpList && analyzedData.pumpList.length > 0) {
+            const firstPump = analyzedData.pumpList[0];
+            summaryAoA.push(['']);
+            summaryAoA.push(['PROJECT INFORMATION']);
+            if (firstPump.ksbReferenceNumber) summaryAoA.push(['KSB Reference Number:', firstPump.ksbReferenceNumber]);
+            if (firstPump.preparedBy) summaryAoA.push(['Prepared By:', firstPump.preparedBy]);
+            if (firstPump.endUserName) summaryAoA.push(['End User Name:', firstPump.endUserName]);
+            if (firstPump.endUserNumber) summaryAoA.push(['End User Number:', firstPump.endUserNumber]);
+            if (firstPump.installationPointNumber) summaryAoA.push(['Installation Point Number:', firstPump.installationPointNumber]);
+        }
+
         XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summaryAoA), 'Summary');
 
         /* Sheet 2 — Common Spares Detail */
@@ -237,6 +250,19 @@ function exportComparisonMatrix(analyzedData) {
             ['Total Pumps:', analyzedData.totalPumps],
             ['Total Unique Parts:', allParts.length],
         ];
+
+        /* Add project information if available */
+        if (pumpList && pumpList.length > 0) {
+            const firstPump = pumpList[0];
+            overviewAoA.push(['']);
+            overviewAoA.push(['PROJECT INFORMATION']);
+            if (firstPump.ksbReferenceNumber) overviewAoA.push(['KSB Reference Number:', firstPump.ksbReferenceNumber]);
+            if (firstPump.preparedBy) overviewAoA.push(['Prepared By:', firstPump.preparedBy]);
+            if (firstPump.endUserName) overviewAoA.push(['End User Name:', firstPump.endUserName]);
+            if (firstPump.endUserNumber) overviewAoA.push(['End User Number:', firstPump.endUserNumber]);
+            if (firstPump.installationPointNumber) overviewAoA.push(['Installation Point Number:', firstPump.installationPointNumber]);
+        }
+
         XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(overviewAoA), 'Overview');
 
         /* Sheet 2 — Matrix */
