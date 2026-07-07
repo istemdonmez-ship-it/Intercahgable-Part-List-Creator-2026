@@ -157,11 +157,6 @@ async function handleAnalyze() {
             model:    f.pumpModel,
             serial:   f.serialNo,
             location: f.location,
-            ksbReferenceNumber: f.ksbReferenceNumber,
-            preparedBy: f.preparedBy,
-            endUserName: f.endUserName,
-            endUserNumber: f.endUserNumber,
-            installationPointNumber: f.installationPointNumber,
         }));
 
         displayResults(analyzedData, interchangeableEnabled);
