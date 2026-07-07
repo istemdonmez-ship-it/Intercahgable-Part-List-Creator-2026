@@ -1941,6 +1941,28 @@
             return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
         }
 
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatPumpHeader(pump, includeSerial = true, asHTML = true) {
+            const displayName = pump.model && pump.model !== 'N/A' ? pump.model : pump.label;
+            const sanitizedName = escapeHtml(displayName);
+            
+            if (!includeSerial || !pump.serial || pump.serial === 'N/A') {
+                return sanitizedName;
+            }
+            
+            const sanitizedSerial = escapeHtml(pump.serial);
+            if (asHTML) {
+                return `${sanitizedName}<br><small>SN: ${sanitizedSerial}</small>`;
+            } else {
+                return `${sanitizedName} (SN: ${sanitizedSerial})`;
+            }
+        }
+
         async function analyzeParts() {
             loading.classList.add('active');
             resultsSection.style.display = 'none';
@@ -2509,7 +2531,7 @@
             html += '<th>DIN 24296 Qty</th>';
             
             pumps.forEach(pump => {
-                html += `<th style="min-width: 80px; text-align: center;">${pump.label}</th>`;
+                html += `<th style="min-width: 80px; text-align: center;">${formatPumpHeader(pump)}</th>`;
             });
             
             html += '</tr></thead><tbody>';
@@ -2596,7 +2618,7 @@
             html += '<table class="parts-table"><thead><tr>';
             html += '<th>Material No.</th><th>Part No.</th><th>Designation</th><th>Category</th><th>Standard Qty</th><th>DIN 24296 Qty</th>';
             pumps.forEach(pump => {
-                html += `<th style="min-width: 100px;">${pump.label}${pump.quantity > 1 ? ` (×${pump.quantity})` : ''}</th>`;
+                html += `<th style="min-width: 100px;">${formatPumpHeader(pump)}${pump.quantity > 1 ? ` (×${pump.quantity})` : ''}</th>`;
             });
             html += '</tr></thead><tbody>';
 
@@ -2814,7 +2836,9 @@
             XLSX.utils.book_append_sheet(wb, summarySheet, 'Overview');
 
             const matrixHeaders = ['Material No.', 'Part No.', 'Designation', 'Category', 'Standard Qty', 'DIN 24296 Qty', 'Savings'];
-            pumps.forEach(pump => matrixHeaders.push(`${pump.label}`));
+            pumps.forEach(pump => {
+                matrixHeaders.push(formatPumpHeader(pump, true, false));
+            });
 
             const matrixData = [matrixHeaders];
             allParts.forEach(part => {

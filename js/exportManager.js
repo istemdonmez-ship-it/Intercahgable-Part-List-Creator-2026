@@ -229,7 +229,7 @@ function exportComparisonMatrix(analyzedData) {
         const matrixHeaders = [
             'Material No.', 'Part No.', 'Designation', 'Category',
             'Standard Qty', 'DIN 24296 Qty', 'Savings',
-            ...pumpList.map((p) => p.label),
+            ...pumpList.map((p) => formatPumpHeader(p, true, false)),
         ];
         const matrixRows = allParts.map((part) => {
             const pumpCols = pumpList.map((pump) =>
