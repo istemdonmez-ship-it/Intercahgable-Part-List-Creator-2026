@@ -10,34 +10,12 @@
    ============================================================ */
 
 /**
- * Build project information rows for Excel exports.
- * @param {object} pumpList - Array of pump objects from analyzedData
- * @returns {Array[]} AoA rows with project information or empty array if no data.
- */
-function buildProjectInfoRows(pumpList) {
-    if (!pumpList || pumpList.length === 0) {
-        return [];
-    }
-
-    const firstPump = pumpList[0];
-    const rows = [[''], ['PROJECT INFORMATION']];
-    
-    if (firstPump.ksbReferenceNumber) rows.push(['KSB Reference Number:', firstPump.ksbReferenceNumber]);
-    if (firstPump.preparedBy) rows.push(['Prepared By:', firstPump.preparedBy]);
-    if (firstPump.endUserName) rows.push(['End User Name:', firstPump.endUserName]);
-    if (firstPump.endUserNumber) rows.push(['End User Number:', firstPump.endUserNumber]);
-    if (firstPump.installationPointNumber) rows.push(['Installation Point Number:', firstPump.installationPointNumber]);
-    
-    return rows;
-}
-
-/**
  * Build a generic DIN 24296 header block for Excel workbooks.
  * @param {object} analyzedData
  * @returns {Array[]} AoA rows for the summary sheet.
  */
 function buildSummaryAoA(analyzedData) {
-    const summaryRows = [
+    return [
         ['INTERCHANGEABLE PARTS LIST — DIN 24296 TABLE 32 COMPLIANT'],
         ['Generated:', new Date().toLocaleString()],
         ['Standard:', 'DIN 24296 Section 7.7.2, Table 32'],
@@ -49,11 +27,6 @@ function buildSummaryAoA(analyzedData) {
         ['Common Parts:', analyzedData.common.length],
         ['DIN 24296 Optimization:', analyzedData.din24296Enabled ? 'Enabled' : 'Disabled'],
     ];
-
-    /* Add project information if available */
-    summaryRows.push(...buildProjectInfoRows(analyzedData.pumpList));
-
-    return summaryRows;
 }
 
 /**
@@ -188,10 +161,6 @@ function exportCommonSparesReport(analyzedData) {
             ['Total DIN 24296 Quantity:', commonParts.reduce((s, p) => s + p.recommendedQty, 0)],
             ['Total Savings:', commonParts.reduce((s, p) => s + p.savings, 0)],
         ];
-
-        /* Add project information if available */
-        summaryAoA.push(...buildProjectInfoRows(analyzedData.pumpList));
-
         XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summaryAoA), 'Summary');
 
         /* Sheet 2 — Common Spares Detail */
@@ -254,10 +223,6 @@ function exportComparisonMatrix(analyzedData) {
             ['Total Pumps:', analyzedData.totalPumps],
             ['Total Unique Parts:', allParts.length],
         ];
-
-        /* Add project information if available */
-        overviewAoA.push(...buildProjectInfoRows(pumpList));
-
         XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(overviewAoA), 'Overview');
 
         /* Sheet 2 — Matrix */
