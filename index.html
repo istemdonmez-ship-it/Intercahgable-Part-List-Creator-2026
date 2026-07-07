@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="KSB Pump - Professional spare parts analysis tool compliant with DIN 24296 Table 32">
+    <meta name="keywords" content="KSB, pump, spare parts, DIN 24296, interchangeable parts">
+    <meta name="author" content="KSB Pump">
+    <title>KSB Pump - Interchangeable Parts List Creator | DIN 24296 Compliant</title>
+    
+    <!-- Enhanced Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self';">
+    
+    <!-- External Libraries with SRI -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" 
+            integrity="sha512-r22gChDnGvBylk90+2e/ycr+equJ  @Pj/j/cjC" 
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js" 
+            crossorigin="anonymous"></script>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+    <div class="container">
+        <!-- KSB Header -->
+        <header class="header" role="banner">
+            <div class="header-brand">
+                <div class="brand-logo">
+                    <span class="brand-icon">🏢</span>
+                    <span class="brand-name">KSB Pump</span>
+                </div>
+                <h1>Interchangeable Parts List Creator</h1>
+                <p class="subtitle">Professional Spare Parts Analysis | DIN 24296 Table 32 Compliant</p>
+            </div>
+        </header>
+
+        <main class="main-content" role="main">
+            <!-- DIN Standard Banner -->
+            <section class="din-standard-banner" aria-labelledby="din-banner-title">
+                <h3 id="din-banner-title">📋 DIN 24296 Standard - Table 32 Implementation</h3>
+                <p><strong>Recommended spare parts stock for 2 years' operation</strong></p>
+                <p>This application implements the exact DIN 24296 Table 32 lookup table for centrifugal pump spare parts stock calculation. 
+                   Quantities are based on fleet size (2-10+ pumps) and part criticality, not simple percentages.</p>
+                
+                <div class="din-table-reference">
+                    <h4>📊 DIN 24296 Table 32 - Quick Reference</h4>
+                    <p style="margin-bottom: 15px; color: #666;">Official recommended quantities by fleet size:</p>
+                    <table class="din-reference-table" aria-label="DIN 24296 Table 32 Quick Reference">
+                        <thead>
+                            <tr>
+                                <th scope="col">Part Type</th>
+                                <th scope="col">2</th>
+                                <th scope="col">3</th>
+                                <th scope="col">4</th>
+                                <th scope="col">5</th>
+                                <th scope="col">6-7</th>
+                                <th scope="col">8-9</th>
+                                <th scope="col">10+</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th scope="row">Shaft / Impeller</th>
+                                <td>1</td>
+                                <td>1</td>
+                                <td>1</td>
+                                <td>2</td>
+                                <td>2</td>
+                                <td>2</td>
+                                <td>20%</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Bearings (all types)</th>
+                                <td>1</td>
+                                <td>1</td>
+                                <td>2</td>
+                                <td>2</td>
+                                <td>2</td>
+                                <td>3</td>
+                                <td>25%</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Wear Rings / Sleeve</th>
+                                <td>2</td>
+                                <td>2</td>
+                                <td>2</td>
+                                <td>3</td>
+                                <td>3</td>
+                                <td>4</td>
+                                <td>50%</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Sealing Elements (set)</th>
+                                <td>4</td>
+                                <td>6</td>
+                                <td>8</td>
+                                <td>8</td>
+                                <td>9</td>
+                                <td>12</td>
+                                <td>150%</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Mechanical Seal</th>
+                                <td>1</td>
+                                <td>1</td>
+                                <td>2</td>
+                                <td>2</td>
+                                <td>2</td>
+                                <td>3</td>
+                                <td>25%</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Gland Packing (set)</th>
+                                <td>4</td>
+                                <td>4</td>
+                                <td>6</td>
+                                <td>6</td>
+                                <td>6</td>
+                                <td>8</td>
+                                <td>100%</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Coupling Elements</th>
+                                <td>1</td>
+                                <td>1</td>
+                                <td>2</td>
+                                <td>2</td>
+                                <td>3</td>
+                                <td>4</td>
+                                <td>30%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p style="margin-top: 15px; color: #666; font-style: italic;">
+                        <strong>Note:</strong> For 10+ pumps, percentages apply to total fleet quantity per part.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Info Banner -->
+            <div class="info-banner" role="note">
+                <div class="info-banner-icon" aria-hidden="true">💡</div>
+                <div class="info-banner-text">
+                    <h3>How it works</h3>
+                    <p><strong>Step 1:</strong> Upload one CSV or Excel file per pump or pump type<br>
+                       <strong>Step 2:</strong> Label each pump and specify quantity, model, location (optional)<br>
+                       <strong>Step 3:</strong> Enable DIN 24296 Table 32 optimization to find common parts<br>
+                       <strong>Step 4:</strong> Click "Analyze Parts" and review recommendations</p>
+                </div>
+            </div>
+
+            <!-- File Upload Section -->
+            <section class="upload-section" id="uploadSection" aria-labelledby="upload-title">
+                <h2 id="upload-title" class="visually-hidden">Upload Files</h2>
+                <div class="file-input-wrapper">
+                    <input type="file" id="fileInput" multiple accept=".csv,.xlsx,.xls" 
+                           aria-label="Upload CSV or Excel files" class="file-input">
+                    <label for="fileInput" class="file-input-label">
+                        <span class="upload-icon">📁</span>
+                        <span class="upload-text">Click to select files or drag & drop here</span>
+                        <span class="upload-hint">Supported formats: CSV, Excel (.xlsx, .xls) | Max size: 10 MB per file</span>
+                    </label>
+                </div>
+                <div id="uploadedFiles" class="uploaded-files" role="list"></div>
+            </section>
+
+            <!-- DIN Categories Section -->
+            <section id="dinCategoriesSection" style="display:none;" aria-labelledby="din-categories-title">
+                <h2 id="din-categories-title">📦 DIN 24296 Part Categories</h2>
+                <div class="category-info">
+                    <p>Parts are automatically classified into these DIN 24296 standard categories:</p>
+                    <ul class="category-list">
+                        <li><strong>Shafts</strong> — Rotating shafts</li>
+                        <li><strong>Impellers</strong> — Pump impellers and wheels</li>
+                        <li><strong>Bearings</strong> — Ball, roller, and sliding bearings</li>
+                        <li><strong>Seals</strong> — Mechanical seals, gaskets, O-rings</li>
+                        <li><strong>Wear Parts</strong> — Wear rings, sleeves, protection elements</li>
+                        <li><strong>Accessories</strong> — Couplings and other components</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Interchangeable Toggle Section -->
+            <section id="interchangeableSection" style="display:none;" class="toggle-section" 
+                     aria-labelledby="interchangeable-title">
+                <h2 id="interchangeable-title">🔄 DIN 24296 Table 32 Optimization</h2>
+                <p>Enable to apply official DIN 24296 spare parts recommendations for common parts (used in 2+ pumps).</p>
+                <button id="interchangeableToggle" class="toggle-button" role="switch" 
+                        aria-checked="false" aria-label="Toggle DIN 24296 optimization">
+                    <span class="toggle-icon">📊</span>
+                    <span class="toggle-text">Apply DIN 24296 Table 32 (Recommended)</span>
+                </button>
+            </section>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button id="analyzeButton" class="btn btn-primary" disabled 
+                        aria-label="Analyze parts">
+                    🔍 Analyze Parts
+                </button>
+                <button id="clearButton" class="btn btn-secondary" disabled 
+                        aria-label="Clear all data">
+                    🗑️ Clear All
+                </button>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div id="loading" class="loading" role="status" aria-live="polite">
+                <div class="spinner"></div>
+                <p>Analyzing parts data...</p>
+            </div>
+
+            <!-- Results Section -->
+            <section id="resultsSection" class="results-section" style="display:none;" 
+                     aria-labelledby="results-title">
+                <h2 id="results-title">📊 Analysis Results</h2>
+
+                <!-- Search and Filter -->
+                <div class="filter-controls">
+                    <input type="text" id="searchInput" placeholder="🔍 Search parts..." 
+                           aria-label="Search parts" class="search-input">
+                    <select id="categoryFilter" aria-label="Filter by category" class="filter-select">
+                        <option value="all">All Categories</option>
+                    </select>
+                    <select id="commonalityFilter" aria-label="Filter by commonality" class="filter-select">
+                        <option value="all">All Parts</option>
+                        <option value="common">Common Parts (2+ pumps)</option>
+                        <option value="interchangeable">Interchangeable (Table 32)</option>
+                        <option value="high-use">High Use (5+ pumps)</option>
+                    </select>
+                </div>
+
+                <!-- Pump Summary -->
+                <div id="pumpSummary" class="pump-summary"></div>
+
+                <!-- DIN Compliance Info -->
+                <div id="dinComplianceInfo" style="display:none;" class="compliance-info"></div>
+
+                <!-- Savings Card -->
+                <div id="savingsCard" style="display:none;" class="savings-card"></div>
+
+                <!-- Statistics -->
+                <div id="statistics" class="statistics-grid"></div>
+
+                <!-- Tabs -->
+                <div class="tabs" role="tablist">
+                    <button class="tab active" data-tab="all" role="tab" 
+                            aria-selected="true" aria-controls="tab-all">
+                        All Parts
+                    </button>
+                    <button class="tab" data-tab="common-only" role="tab" 
+                            aria-selected="false" aria-controls="tab-common-only">
+                        Common Spares ⭐
+                    </button>
+                    <button class="tab" data-tab="shafts" role="tab" 
+                            aria-selected="false" aria-controls="tab-shafts">
+                        Shafts
+                    </button>
+                    <button class="tab" data-tab="impellers" role="tab" 
+                            aria-selected="false" aria-controls="tab-impellers">
+                        Impellers
+                    </button>
+                    <button class="tab" data-tab="seals" role="tab" 
+                            aria-selected="false" aria-controls="tab-seals">
+                        Seals & Gaskets
+                    </button>
+                    <button class="tab" data-tab="bearings" role="tab" 
+                            aria-selected="false" aria-controls="tab-bearings">
+                        Bearings
+                    </button>
+                    <button class="tab" data-tab="wear-parts" role="tab" 
+                            aria-selected="false" aria-controls="tab-wear-parts">
+                        Wear Parts
+                    </button>
+                    <button class="tab" data-tab="accessories" role="tab" 
+                            aria-selected="false" aria-controls="tab-accessories">
+                        Accessories
+                    </button>
+                    <button class="tab" data-tab="comparison" role="tab" 
+                            aria-selected="false" aria-controls="tab-comparison">
+                        Comparison Matrix
+                    </button>
+                </div>
+
+                <!-- Tab Contents -->
+                <div id="tab-all" class="tab-content active" role="tabpanel" aria-labelledby="tab-all">
+                    <table id="allPartsTable" class="parts-table">
+                        <thead>
+                            <tr>
+                                <th>Part No.</th>
+                                <th>Material No.</th>
+                                <th>Designation</th>
+                                <th>Material</th>
+                                <th>Model</th>
+                                <th>Qty/Pump</th>
+                                <th>Standard Qty</th>
+                                <th>DIN 24296 Qty</th>
+                                <th>Savings</th>
+                                <th>Found In</th>
+                                <th>Category</th>
+                                <th>Calculation</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div id="tab-common-only" class="tab-content" role="tabpanel" aria-labelledby="tab-common-only">
+                    <div id="commonSparesHighlight" class="common-spares-highlight"></div>
+                    <table id="commonOnlyTable" class="parts-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Part No.</th>
+                                <th>Material No.</th>
+                                <th>Designation</th>
+                                <th>Category</th>
+                                <th>Qty/Pump</th>
+                                <th>Used In</th>
+                                <th>Standard Qty</th>
+                                <th>DIN 24296 Qty</th>
+                                <th>Savings</th>
+                                <th>Calculation</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <div id="commonSparesMatrix" class="common-spares-matrix"></div>
+                </div>
+
+                <!-- Other category tabs (similar structure) -->
+                <div id="tab-shafts" class="tab-content" role="tabpanel" aria-labelledby="tab-shafts">
+                    <table id="shaftsPartsTable" class="parts-table">
+                        <thead>
+                            <tr>
+                                <th>Part No.</th>
+                                <th>Material No.</th>
+                                <th>Designation</th>
+                                <th>Material</th>
+                                <th>Qty/Pump</th>
+                                <th>Standard Qty</th>
+                                <th>DIN 24296 Qty</th>
+                                <th>Savings</th>
+                                <th>Found In</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div id="tab-impellers" class="tab-content" role="tabpanel" aria-labelledby="tab-impellers">
+                    <table id="impellersPartsTable" class="parts-table">
+                        <thead>
+                            <tr>
+                                <th>Part No.</th>
+                                <th>Material No.</th>
+                                <th>Designation</th>
+                                <th>Material</th>
+                                <th>Qty/Pump</th>
+                                <th>Standard Qty</th>
+                                <th>DIN 24296 Qty</th>
+                                <th>Savings</th>
+                                <th>Found In</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div id="tab-seals" class="tab-content" role="tabpanel" aria-labelledby="tab-seals">
+                    <table id="sealsPartsTable" class="parts-table">
+                        <thead>
+                            <tr>
+                                <th>Part No.</th>
+                                <th>Material No.</th>
+                                <th>Designation</th>
+                                <th>Material</th>
+                                <th>Qty/Pump</th>
+                                <th>Standard Qty</th>
+                                <th>DIN 24296 Qty</th>
+                                <th>Savings</th>
+                                <th>Found In</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div id="tab-bearings" class="tab-content" role="tabpanel" aria-labelledby="tab-bearings">
+                    <table id="bearingsPartsTable" class="parts-table">
+                        <thead>
+                            <tr>
+                                <th>Part No.</th>
+                                <th>Material No.</th>
+                                <th>Designation</th>
+                                <th>Material</th>
+                                <th>Qty/Pump</th>
+                                <th>Standard Qty</th>
+                                <th>DIN 24296 Qty</th>
+                                <th>Savings</th>
+                                <th>Found In</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div id="tab-wear-parts" class="tab-content" role="tabpanel" aria-labelledby="tab-wear-parts">
+                    <table id="wearPartsTable" class="parts-table">
+                        <thead>
+                            <tr>
+                                <th>Part No.</th>
+                                <th>Material No.</th>
+                                <th>Designation</th>
+                                <th>Material</th>
+                                <th>Qty/Pump</th>
+                                <th>Standard Qty</th>
+                                <th>DIN 24296 Qty</th>
+                                <th>Savings</th>
+                                <th>Found In</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div id="tab-accessories" class="tab-content" role="tabpanel" aria-labelledby="tab-accessories">
+                    <table id="accessoriesPartsTable" class="parts-table">
+                        <thead>
+                            <tr>
+                                <th>Part No.</th>
+                                <th>Material No.</th>
+                                <th>Designation</th>
+                                <th>Material</th>
+                                <th>Qty/Pump</th>
+                                <th>Standard Qty</th>
+                                <th>DIN 24296 Qty</th>
+                                <th>Savings</th>
+                                <th>Found In</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div id="tab-comparison" class="tab-content" role="tabpanel" aria-labelledby="tab-comparison">
+                    <div id="comparisonView" class="comparison-view"></div>
+                </div>
+
+                <!-- Export Buttons -->
+                <div class="export-buttons">
+                    <button id="exportExcel" class="btn btn-export btn-excel" 
+                            aria-label="Export to Excel">
+                        📊 Export to Excel
+                    </button>
+                    <button id="exportCSV" class="btn btn-export btn-csv" 
+                            aria-label="Export to CSV">
+                        📄 Export to CSV
+                    </button>
+                    <button id="exportCommonReport" class="btn btn-export btn-report" 
+                            aria-label="Export common spares report">
+                        ⭐ Common Spares Report
+                    </button>
+                    <button id="exportComparisonReport" class="btn btn-export btn-matrix" 
+                            aria-label="Export comparison matrix">
+                        🔄 Comparison Matrix
+                    </button>
+                    <button id="exportPDF" class="btn btn-export btn-pdf" 
+                            aria-label="Print or export to PDF">
+                        🖨️ Print / PDF
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <!-- KSB Footer -->
+        <footer class="footer" role="contentinfo">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <strong>KSB Pump Solutions</strong>
+                    <p>Professional Spare Parts Analysis Tool</p>
+                </div>
+                <div class="footer-info">
+                    <p><strong>DIN 24296 Compliant</strong> | Section 7.7.2, Table 32</p>
+                    <p>Version 2.0.0 | © 2026 KSB Pump</p>
+                </div>
+                <div class="footer-contact">
+                    <p>Support: <a href="mailto:support@ksb.com">support@ksb.com</a></p>
+                    <p>Web: <a href="https://www.ksb.com" target="_blank" rel="noopener">www.ksb.com</a></p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- JavaScript Modules (loaded in order) -->
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/dinClassifier.js"></script>
+    <script src="js/dataProcessor.js"></script>
+    <script src="js/fileHandler.js"></script>
+    <script src="js/exportManager.js"></script>
+    <script src="js/uiController.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
