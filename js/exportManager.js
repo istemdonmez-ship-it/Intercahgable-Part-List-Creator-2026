@@ -316,7 +316,7 @@ function exportPumpInventorySummary(analyzedData) {
             ['Fleet Size Category:', fleetCategory],
             [''],
             ['PUMP DETAILS'],
-            ['#', 'Pump Label', 'Quantity', 'Model', 'Serial Number', 'Location', 'Source File'],
+            ['#', 'Pump Label', 'Quantity', 'Serial Number', 'Location', 'Source File'],
         ];
 
         pumpList.forEach((pump, index) => {
@@ -327,7 +327,6 @@ function exportPumpInventorySummary(analyzedData) {
                 index + 1,
                 displayLabel,
                 pump.quantity,
-                pump.model || 'N/A',
                 pump.serial || 'N/A',
                 pump.location || 'N/A',
                 pump.file,
