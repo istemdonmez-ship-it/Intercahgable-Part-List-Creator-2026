@@ -1881,17 +1881,17 @@
         });
 
         // Export buttons
-        const exportExcel = document.getElementById('exportExcel');
-        const exportCSV = document.getElementById('exportCSV');
-        const exportCommonReport = document.getElementById('exportCommonReport');
-        const exportComparisonReport = document.getElementById('exportComparisonReport');
-        const exportPDF = document.getElementById('exportPDF');
+        const exportExcelBtn = document.getElementById('exportExcel');
+        const exportCSVBtn = document.getElementById('exportCSV');
+        const exportCommonReportBtn = document.getElementById('exportCommonReport');
+        const exportComparisonReportBtn = document.getElementById('exportComparisonReport');
+        const exportPDFBtn = document.getElementById('exportPDF');
         
-        if (exportExcel) exportExcel.addEventListener('click', exportToExcel);
-        if (exportCSV) exportCSV.addEventListener('click', exportToCSV);
-        if (exportCommonReport) exportCommonReport.addEventListener('click', exportCommonSparesReport);
-        if (exportComparisonReport) exportComparisonReport.addEventListener('click', exportComparisonMatrix);
-        if (exportPDF) exportPDF.addEventListener('click', printReport);
+        if (exportExcelBtn) exportExcelBtn.addEventListener('click', exportToExcel);
+        if (exportCSVBtn) exportCSVBtn.addEventListener('click', exportToCSV);
+        if (exportCommonReportBtn) exportCommonReportBtn.addEventListener('click', exportCommonSparesReport);
+        if (exportComparisonReportBtn) exportComparisonReportBtn.addEventListener('click', exportComparisonMatrix);
+        if (exportPDFBtn) exportPDFBtn.addEventListener('click', printReport);
 
         function handleFileSelect(e) {
             const files = Array.from(e.target.files);
