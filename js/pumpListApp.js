@@ -33,7 +33,7 @@ const MODEL_ALIASES = ['model', 'pump model', 'pump type', 'type', 'description'
  * Accepted header aliases for the "Serial No" column (case-insensitive, substring match).
  * @type {string[]}
  */
-const SERIAL_ALIASES = ['serial no', 's/n', 'serial number', 'serial-no', 'sn', 'serialno'];
+const SERIAL_ALIASES = ['serial no', 's/n', 'serial number', 'serial-no', 'sn'];
 
 /**
  * Identify which column index corresponds to 'model' and which to 'serialNo'
