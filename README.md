@@ -16,6 +16,7 @@ A professional, browser-based tool for generating **DIN 24296 compliant** interc
 - 📤 **Multiple export formats** — Excel (.xlsx), CSV, common spares report, pump comparison matrix, print/PDF
 - 🔍 **Search and filter** — full-text search with category and commonality filters
 - 📱 **Responsive design** — works on desktop, tablet, and mobile
+- 📋 **Pump List Creator** — upload pump data files and generate a numbered interchangeable pump list table (Pump No | Model | Serial No)
 
 ---
 
@@ -57,7 +58,8 @@ No installation or server is required. Open `index.html` (or `Code.html` for sin
 
 ```
 /
-├── index.html              — Main application (modular version)
+├── index.html              — Main application (modular version) - Spare Parts Analyzer
+├── pump-list.html          — Pump List Creator tool
 ├── Code.html               — Single-file distribution version
 ├── README.md               — This file
 ├── CHANGELOG.md            — Version history and changes
@@ -73,7 +75,8 @@ No installation or server is required. Open `index.html` (or `Code.html` for sin
 │   ├── config.js           — Configuration constants and settings
 │   ├── errorHandler.js     — Centralized error handling
 │   ├── keyboardShortcuts.js— Keyboard shortcuts handler
-│   ├── app.js              — Main application entry point
+│   ├── app.js              — Main application entry point (Spare Parts Analyzer)
+│   ├── pumpListApp.js      — Pump List Creator entry point and logic
 │   ├── fileHandler.js      — File upload, validation, drag & drop, parsing
 │   ├── dinClassifier.js    — DIN 24296 classification & Table 32 lookup
 │   ├── dataProcessor.js    — Data analysis, consolidation, filtering
@@ -87,12 +90,15 @@ No installation or server is required. Open `index.html` (or `Code.html` for sin
 │   └── API.md              — JavaScript module documentation
 │
 └── examples/
-    └── sample-data.csv     — Example input file with pump spare parts
+    ├── sample-data.csv         — Example spare parts input file
+    └── sample-pump-list.csv    — Example pump list input file
 ```
 
 ---
 
 ## 🔧 Usage
+
+### Spare Parts Analyzer (DIN 24296)
 
 1. Open `index.html` (or `Code.html` for single-file version) in your browser.
 2. Upload one or more CSV / Excel files (one file per pump or pump type).
@@ -102,6 +108,59 @@ No installation or server is required. Open `index.html` (or `Code.html` for sin
 6. Review results in the tabs and export in your preferred format.
 
 For detailed instructions, see [docs/USAGE.md](docs/USAGE.md).
+
+---
+
+### 📋 Pump List Creator
+
+Open `pump-list.html` in your browser (or click the **Pump List Creator** link in the header of `index.html`).
+
+#### Accepted file formats
+
+| Format | Extension | Notes |
+|--------|-----------|-------|
+| CSV    | `.csv`    | Semicolon (`;`) or comma (`,`) delimited; auto-detected |
+| Excel  | `.xlsx`   | First sheet is used; header row is auto-located (first 20 rows) |
+| Excel  | `.xls`    | Same as `.xlsx` |
+
+#### Expected columns
+
+Each input file should contain at least one of these columns (column names are case-insensitive):
+
+| Column | Accepted header names |
+|--------|----------------------|
+| **Model** | `Model`, `Pump Model`, `Pump Type`, `Type`, `Description` |
+| **Serial No** | `Serial No`, `Serial No.`, `Serial Number`, `S/N`, `SN`, `Serial-No` |
+
+Rows where both Model and Serial No are empty are skipped. Rows with only one field are included.
+
+**Minimal example (`my-pumps.csv`):**
+```
+Model;Serial No
+ETANORM G 150-315 SP;997050149500010000
+ETANORM G 150-315 SP;997050149500010001
+ETANORM G 125-315 SP;997050149500020000
+```
+
+See [`examples/sample-pump-list.csv`](examples/sample-pump-list.csv) for a ready-to-use example file.
+
+#### How to use
+
+1. Open `pump-list.html` in your browser.
+2. Upload one or more CSV / Excel files using the upload area (click or drag & drop).
+3. Click **Generate List**.
+4. The combined pump list is displayed as a numbered table: **Pump No | Model | Serial No (S/N)**.
+5. Export the result with **Export Excel**, **Export CSV**, or **Print / PDF**.
+
+#### Error handling
+
+| Situation | What the app does |
+|-----------|------------------|
+| Wrong file type (e.g. `.txt`, `.pdf`) | Shows an error notification; file is rejected |
+| File exceeds 10 MB | Shows an error notification; file is rejected |
+| Required columns not found | Shows an error notification after parsing |
+| File is empty or has no data rows | No rows are added; notification shown |
+| Duplicate file added | Shows an info notification; file is not added twice |
 
 ---
 
